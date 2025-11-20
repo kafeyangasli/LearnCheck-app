@@ -1,0 +1,913 @@
+{
+	"info": {
+		"_postman_id": "learncheck-api-collection",
+		"name": "LearnCheck Backend API",
+		"description": "Complete API collection for LearnCheck adaptive learning platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "learncheck"
+	},
+	"item": [
+		{
+			"name": "Health & Info",
+			"item": [
+				{
+					"name": "Health Check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Check if the API server is running and get service status"
+					},
+					"response": []
+				},
+				{
+					"name": "API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Get API information and available endpoints"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for checking API health and information"
+		},
+		{
+			"name": "Questions",
+			"item": [
+				{
+					"name": "Generate Questions (Attempt 1 - Easy)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store question IDs for later use",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.status === 'success' && jsonData.data.questions) {",
+									"        pm.environment.set('question_id_0', jsonData.data.questions[0].question_id);",
+									"        pm.environment.set('question_id_1', jsonData.data.questions[1].question_id);",
+									"        pm.environment.set('question_id_2', jsonData.data.questions[2].question_id);",
+									"        pm.environment.set('tutorial_id', jsonData.data.tutorial_id);",
+									"        pm.environment.set('user_id', jsonData.data.user_id);",
+									"        console.log('Question IDs saved to environment');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"user_id\": \"user123\",\n  \"attempt_number\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Generate 3 quiz questions with easy difficulty (first attempt)"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Questions (Attempt 2 - Medium)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store question IDs for later use",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.status === 'success' && jsonData.data.questions) {",
+									"        pm.environment.set('question_id_0', jsonData.data.questions[0].question_id);",
+									"        pm.environment.set('question_id_1', jsonData.data.questions[1].question_id);",
+									"        pm.environment.set('question_id_2', jsonData.data.questions[2].question_id);",
+									"        console.log('Question IDs saved to environment');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"user_id\": \"user123\",\n  \"attempt_number\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Generate 3 quiz questions with medium difficulty (second attempt)"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Questions (Attempt 3+ - Hard)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Store question IDs for later use",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    if (jsonData.status === 'success' && jsonData.data.questions) {",
+									"        pm.environment.set('question_id_0', jsonData.data.questions[0].question_id);",
+									"        pm.environment.set('question_id_1', jsonData.data.questions[1].question_id);",
+									"        pm.environment.set('question_id_2', jsonData.data.questions[2].question_id);",
+									"        console.log('Question IDs saved to environment');",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"user_id\": \"user123\",\n  \"attempt_number\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Generate 3 quiz questions with hard difficulty (third attempt or more)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for generating adaptive quiz questions"
+		},
+		{
+			"name": "Answers",
+			"item": [
+				{
+					"name": "Submit Answer - Correct (Option 0)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"{{question_id_0}}\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Submit answer for the first question (using saved question_id from environment)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Answer - Incorrect (Option 1)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"{{question_id_0}}\",\n  \"selected_answer\": 1,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Submit incorrect answer to see feedback for wrong answer"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Answer - Manual Question ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"react-basics_user123_1_0\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Submit answer using manual question ID (useful if environment variables aren't set)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for submitting and validating answers"
+		},
+		{
+			"name": "Progress",
+			"item": [
+				{
+					"name": "Get Progress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/progress/user123/react-basics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"user123",
+								"react-basics"
+							]
+						},
+						"description": "Get user's learning progress for a specific tutorial"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Progress (Using Variables)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/progress/{{user_id}}/{{tutorial_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"{{user_id}}",
+								"{{tutorial_id}}"
+							]
+						},
+						"description": "Get progress using environment variables (set after generating questions)"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Progress - First Attempt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user123\",\n  \"tutorial_id\": \"react-basics\",\n  \"attempt_data\": {\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"score\": 2,\n    \"total_questions\": 3,\n    \"difficulty\": \"easy\",\n    \"time_taken\": 300,\n    \"answers\": [\n      {\n        \"question_id\": \"react-basics_user123_1_0\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"react-basics_user123_1_1\",\n        \"selected_answer\": 1,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"react-basics_user123_1_2\",\n        \"selected_answer\": 2,\n        \"is_correct\": false\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/progress/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"save"
+							]
+						},
+						"description": "Save first attempt with score 2/3 (easy difficulty)"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Progress - Second Attempt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user123\",\n  \"tutorial_id\": \"react-basics\",\n  \"attempt_data\": {\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"score\": 3,\n    \"total_questions\": 3,\n    \"difficulty\": \"medium\",\n    \"time_taken\": 250,\n    \"answers\": [\n      {\n        \"question_id\": \"react-basics_user123_2_0\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"react-basics_user123_2_1\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"react-basics_user123_2_2\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/progress/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"save"
+							]
+						},
+						"description": "Save second attempt with perfect score 3/3 (medium difficulty)"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Progress - Third Attempt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user123\",\n  \"tutorial_id\": \"react-basics\",\n  \"attempt_data\": {\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"score\": 1,\n    \"total_questions\": 3,\n    \"difficulty\": \"hard\",\n    \"time_taken\": 450,\n    \"answers\": [\n      {\n        \"question_id\": \"react-basics_user123_3_0\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"react-basics_user123_3_1\",\n        \"selected_answer\": 1,\n        \"is_correct\": false\n      },\n      {\n        \"question_id\": \"react-basics_user123_3_2\",\n        \"selected_answer\": 2,\n        \"is_correct\": false\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/progress/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"save"
+							]
+						},
+						"description": "Save third attempt with lower score 1/3 (hard difficulty)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing user learning progress"
+		},
+		{
+			"name": "Content",
+			"item": [
+				{
+					"name": "Get Tutorial Content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/content/react-basics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"content",
+								"react-basics"
+							]
+						},
+						"description": "Get tutorial content from Dicoding API (cleaned text without HTML)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tutorial Content (Using Variable)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/content/{{tutorial_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"content",
+								"{{tutorial_id}}"
+							]
+						},
+						"description": "Get content using tutorial_id from environment variables"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for fetching tutorial content"
+		},
+		{
+			"name": "Error Testing",
+			"item": [
+				{
+					"name": "Generate Questions - Missing tutorial_id",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user123\",\n  \"attempt_number\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Test validation error - missing tutorial_id (should return 400)"
+					},
+					"response": []
+				},
+				{
+					"name": "Generate Questions - Invalid attempt_number",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"user_id\": \"user123\",\n  \"attempt_number\": 0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Test validation error - attempt_number must be >= 1 (should return 400)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Answer - Invalid selected_answer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"react-basics_user123_1_0\",\n  \"selected_answer\": 5,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Test validation error - selected_answer must be 0-3 (should return 400)"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Answer - Question Not Found",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"nonexistent_question_id\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Test error when question doesn't exist (should return 404)"
+					},
+					"response": []
+				},
+				{
+					"name": "Save Progress - Missing user_id",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"attempt_data\": {\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"score\": 2\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/progress/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"save"
+							]
+						},
+						"description": "Test validation error - missing user_id (should return 400)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for testing error handling and validation"
+		},
+		{
+			"name": "Complete Workflow",
+			"item": [
+				{
+					"name": "1. Check Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Step 1: Verify API is running"
+					},
+					"response": []
+				},
+				{
+					"name": "2. Generate Questions",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set('question_id_0', jsonData.data.questions[0].question_id);",
+									"    pm.environment.set('question_id_1', jsonData.data.questions[1].question_id);",
+									"    pm.environment.set('question_id_2', jsonData.data.questions[2].question_id);",
+									"    pm.environment.set('tutorial_id', jsonData.data.tutorial_id);",
+									"    pm.environment.set('user_id', jsonData.data.user_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"tutorial_id\": \"react-basics\",\n  \"user_id\": \"user123\",\n  \"attempt_number\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"questions",
+								"generate"
+							]
+						},
+						"description": "Step 2: Generate quiz questions"
+					},
+					"response": []
+				},
+				{
+					"name": "3. Submit Answer 1",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"{{question_id_0}}\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Step 3: Submit first answer"
+					},
+					"response": []
+				},
+				{
+					"name": "4. Submit Answer 2",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"{{question_id_1}}\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/questions/generate",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Step 4: Submit second answer"
+					},
+					"response": []
+				},
+				{
+					"name": "5. Submit Answer 3",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"question_id\": \"{{question_id_2}}\",\n  \"selected_answer\": 0,\n  \"user_id\": \"user123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/answers/submit",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"answers",
+								"submit"
+							]
+						},
+						"description": "Step 5: Submit third answer"
+					},
+					"response": []
+				},
+				{
+					"name": "6. Save Progress",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user_id\": \"user123\",\n  \"tutorial_id\": \"react-basics\",\n  \"attempt_data\": {\n    \"timestamp\": \"{{$isoTimestamp}}\",\n    \"score\": 3,\n    \"total_questions\": 3,\n    \"difficulty\": \"easy\",\n    \"time_taken\": 300,\n    \"answers\": [\n      {\n        \"question_id\": \"{{question_id_0}}\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"{{question_id_1}}\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      },\n      {\n        \"question_id\": \"{{question_id_2}}\",\n        \"selected_answer\": 0,\n        \"is_correct\": true\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/progress/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"save"
+							]
+						},
+						"description": "Step 6: Save attempt progress"
+					},
+					"response": []
+				},
+				{
+					"name": "7. Get Progress",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/progress/user123/react-basics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"progress",
+								"user123",
+								"react-basics"
+							]
+						},
+						"description": "Step 7: View saved progress"
+					},
+					"response": []
+				},
+				{
+					"name": "8. Get Content",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/content/react-basics",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"content",
+								"react-basics"
+							]
+						},
+						"description": "Step 8: Get tutorial content"
+					},
+					"response": []
+				}
+			],
+			"description": "Complete workflow from start to finish - run these in order"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3001",
+			"type": "string"
+		},
+		{
+			"key": "tutorial_id",
+			"value": "react-basics",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "user123",
+			"type": "string"
+		},
+		{
+			"key": "question_id_0",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "question_id_1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "question_id_2",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
