@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { learnCheckApi } from "../services/api";
 import type { Question, QuizState, AttemptData } from "../types";
 import QuestionCard from "./QuestionCard";

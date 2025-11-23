@@ -1,3 +1,5 @@
+import React from "react";
+
 interface ResultCardProps {
   score: number;
   totalQuestions: number;

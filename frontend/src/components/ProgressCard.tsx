@@ -1,3 +1,5 @@
+import React from "react";
+
 interface ProgressCardProps {
   currentQuestion: number;
   totalQuestions: number;

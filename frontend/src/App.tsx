@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import QuizContainer from './components/QuizContainer';
 import { getIframeParams, isInIframe } from './utils/iframeParams';
