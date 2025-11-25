@@ -39,7 +39,9 @@ const QuestionCard = ({
             <span className="option-letter">
               {String.fromCharCode(65 + index)}
             </span>
-            <span className="option-text">{option}</span>
+            <span className="option-text">
+              {typeof option === 'object' ? (option as any).text : option}
+            </span>
           </button>
         ))}
       </div>

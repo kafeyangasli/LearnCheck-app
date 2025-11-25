@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { learnCheckApi } from "../services/api";
-import type { Question, QuizState, AttemptData } from "../types";
+import type { Question, QuizState } from "../types";
 import QuestionCard from "./QuestionCard";
 import FeedbackCard from "./FeedbackCard";
 import ProgressCard from "./ProgressCard";
@@ -38,16 +38,14 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       setLoading(true);
       setError(null);
 
-      // Get progress to determine attempt number
-      const progress = await learnCheckApi.getProgress(userId, tutorialId);
-      const nextAttempt = (progress.total_attempts || 0) + 1;
-      setAttemptNumber(nextAttempt);
+      // Default to attempt 1 since backend doesn't track attempts anymore
+      setAttemptNumber(1);
 
       // Generate questions
       const response = await learnCheckApi.generateQuestions(
         tutorialId,
         userId,
-        nextAttempt,
+        1, // attempt_number
       );
 
       setQuestions(response.data.questions);
@@ -82,23 +80,61 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       return;
     }
 
-    try {
-      const response = await learnCheckApi.submitAnswer({
-        question_id: currentQuestion.question_id,
-        selected_answer: selectedAnswer,
-        user_id: userId,
-      });
+    // Local Validation Logic (New Backend)
+    let isCorrect = false;
+    let feedback = "";
 
-      setQuizState((prev) => ({
-        ...prev,
-        showFeedback: true,
-        feedback: response.data.feedback,
-        isCorrect: response.data.is_correct,
-        score: prev.score + (response.data.is_correct ? 1 : 0),
-      }));
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to submit answer");
+    // Feedback Prefixes (From WS 2)
+    const correctPrefixes = [
+      "Mantap, jawabanmu benar! ",
+      "Tepat sekali! ",
+      "Keren, kamu paham konsepnya! ",
+      "Betul! Lanjutkan momentum belajarmu! ",
+      "Luar biasa, pemahamanmu solid! "
+    ];
+
+    const incorrectPrefixes = [
+      "Hampir benar! Coba kita lihat lagi yuk. ",
+      "Belum tepat, tapi jangan khawatir, ini bagian dari belajar. ",
+      "Oops, masih kurang pas. Yuk kita bedah bareng! ",
+      "Sedikit lagi! Coba perhatikan penjelasan berikut. ",
+      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. "
+    ];
+
+    if (currentQuestion._rawOptions && currentQuestion.correctOptionId) {
+      const selectedOptionId = currentQuestion._rawOptions[selectedAnswer].id;
+      isCorrect = selectedOptionId === currentQuestion.correctOptionId;
+
+      // Smart Feedback Generation
+      const prefix = isCorrect
+        ? correctPrefixes[Math.floor(Math.random() * correctPrefixes.length)]
+        : incorrectPrefixes[Math.floor(Math.random() * incorrectPrefixes.length)];
+
+      // Parse Explanation & Hint
+      const rawExplanation = currentQuestion.explanation || "";
+      const explanationParts = rawExplanation.split('Hint:');
+      const mainExplanation = explanationParts[0].trim();
+      const hintText = explanationParts.length > 1 ? explanationParts[1].trim() : null;
+
+      // Combine for WS 1 UI
+      feedback = `${prefix}\n\n${mainExplanation}`;
+      if (hintText) {
+        feedback += `\n\n💡 Hint: ${hintText}`;
+      }
+
+    } else {
+      // Fallback for legacy or missing data
+      console.warn("Missing validation data for question", currentQuestion.question_id);
+      feedback = "Feedback unavailable";
     }
+
+    setQuizState((prev) => ({
+      ...prev,
+      showFeedback: true,
+      feedback: feedback,
+      isCorrect: isCorrect,
+      score: prev.score + (isCorrect ? 1 : 0),
+    }));
   };
 
   const handleNextQuestion = () => {
@@ -121,28 +157,8 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   };
 
   const completeQuiz = async () => {
-    const timeTaken = Math.floor((Date.now() - quizState.startTime) / 1000);
-
-    const attemptData: AttemptData = {
-      timestamp: new Date().toISOString(),
-      score: quizState.score,
-      total_questions: questions.length,
-      difficulty: questions[0]?.difficulty || "medium",
-      time_taken: timeTaken,
-      answers: questions.map((q, index) => ({
-        question_id: q.question_id,
-        selected_answer: quizState.selectedAnswers[index] || 0,
-        is_correct: quizState.selectedAnswers[index] !== null,
-      })),
-    };
-
-    try {
-      await learnCheckApi.saveProgress(userId, tutorialId, attemptData);
-      setQuizState((prev) => ({ ...prev, isCompleted: true }));
-    } catch (err: any) {
-      console.error("Failed to save progress:", err);
-      setQuizState((prev) => ({ ...prev, isCompleted: true }));
-    }
+    // Just mark as completed locally
+    setQuizState((prev) => ({ ...prev, isCompleted: true }));
   };
 
   const handleRetry = () => {

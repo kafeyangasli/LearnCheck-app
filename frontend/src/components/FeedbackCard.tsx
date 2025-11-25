@@ -23,7 +23,7 @@ const FeedbackCard = ({
       </div>
 
       <div className="feedback-content">
-        <p>{feedback}</p>
+        <p style={{ whiteSpace: 'pre-wrap' }}>{feedback}</p>
       </div>
 
       <div className="feedback-actions">

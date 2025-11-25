@@ -2,8 +2,11 @@
 export interface Question {
   question_id: string;
   question: string;
-  options: string[];
+  options: string[] | { id: string; text: string }[];
   difficulty: "easy" | "medium" | "hard";
+  correctOptionId?: string; // For local validation
+  explanation?: string;     // For feedback
+  _rawOptions?: { id: string; text: string }[]; // Internal use for validation
 }
 
 export interface QuestionResponse {
@@ -17,51 +20,8 @@ export interface QuestionResponse {
   };
 }
 
-// Answer types
-export interface AnswerSubmission {
-  question_id: string;
-  selected_answer: number;
-  user_id: string;
-}
-
-export interface AnswerResponse {
-  status: string;
-  data: {
-    is_correct: boolean;
-    correct_answer: number;
-    selected_answer: number;
-    feedback: string;
-  };
-}
-
-// Progress types
-export interface AttemptData {
-  timestamp: string;
-  score: number;
-  total_questions: number;
-  difficulty: string;
-  time_taken?: number;
-  answers: Array<{
-    question_id: string;
-    selected_answer: number;
-    is_correct: boolean;
-  }>;
-}
-
-export interface Progress {
-  user_id: string;
-  tutorial_id: string;
-  attempts: Array<{
-    attempt_number: number;
-    timestamp: string;
-    score: number;
-    total_questions: number;
-    difficulty: string;
-  }>;
-  total_attempts?: number;
-  average_score?: string;
-  best_score?: number;
-}
+// Answer types removed
+// Progress types removed
 
 // App State
 export interface QuizState {

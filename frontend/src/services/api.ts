@@ -1,7 +1,7 @@
 import axios from 'axios';
-import type { QuestionResponse, AnswerSubmission, AnswerResponse, AttemptData, Progress } from '../types';
+import type { QuestionResponse } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4001';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -11,47 +11,52 @@ const api = axios.create({
 });
 
 export const learnCheckApi = {
-  // Generate questions
+  // Generate questions (Adapted for new Backend)
   generateQuestions: async (
     tutorial_id: string,
     user_id: string,
     attempt_number: number
   ): Promise<QuestionResponse> => {
-    const response = await api.post<QuestionResponse>('/api/questions/generate', {
-      tutorial_id,
-      user_id,
-      attempt_number,
+    // New Backend Endpoint: GET /api/v1/assessment
+    const response = await api.get('/api/v1/assessment', {
+      params: { tutorial_id, user_id }
     });
-    return response.data;
+
+    const newQuestions = response.data.assessment.questions;
+
+    // Map new structure to old structure
+    const mappedQuestions = newQuestions.map((q: any) => ({
+      question_id: q.id,
+      question: q.questionText,
+      // Map options to simple strings for compatibility, OR keep objects if components handle it
+      // For now, let's keep the objects but cast them, as we updated the type
+      options: q.options.map((opt: any) => opt.text),
+      difficulty: 'medium', // Default since new API doesn't return difficulty per question
+      correctOptionId: q.correctOptionId,
+      explanation: q.explanation,
+      _rawOptions: q.options // Store raw options to find correct ID later
+    }));
+
+    return {
+      status: 'success',
+      data: {
+        questions: mappedQuestions,
+        tutorial_id,
+        user_id,
+        attempt_number,
+        difficulty: 'medium'
+      }
+    };
   },
 
-  // Submit answer
-  submitAnswer: async (data: AnswerSubmission): Promise<AnswerResponse> => {
-    const response = await api.post<AnswerResponse>('/api/answers/submit', data);
-    return response.data;
-  },
+  // Submit answer (Local Mock)
+  // submitAnswer removed as validation is now local
 
-  // Save progress
-  saveProgress: async (
-    user_id: string,
-    tutorial_id: string,
-    attempt_data: AttemptData
-  ): Promise<{ status: string; message: string; data: Progress }> => {
-    const response = await api.post('/api/progress/save', {
-      user_id,
-      tutorial_id,
-      attempt_data,
-    });
-    return response.data;
-  },
+  // Save progress (Mock - No endpoint yet)
+  // saveProgress removed as backend doesn't support it
 
-  // Get progress
-  getProgress: async (user_id: string, tutorial_id: string): Promise<Progress> => {
-    const response = await api.get<{ status: string; data: Progress }>(
-      `/api/progress/${user_id}/${tutorial_id}`
-    );
-    return response.data.data;
-  },
+  // Get progress (Mock - No endpoint yet)
+  // getProgress removed as backend doesn't support it
 };
 
 export default api;
