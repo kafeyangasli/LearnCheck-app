@@ -1,12 +1,14 @@
-/**
- * Shared type definitions for the backend
- */
-
 export interface UserPreferences {
   theme: 'dark' | 'light';
   fontSize: 'small' | 'medium' | 'large';
   fontStyle: 'default' | 'serif' | 'mono';
   layoutWidth: 'fullWidth' | 'standard';
+}
+
+export interface UserPreference {
+  difficulty?: string;
+  language?: string;
+  tone?: string;
 }
 
 export interface QuizOption {
@@ -22,9 +24,21 @@ export interface QuizQuestion {
   explanation: string;
 }
 
+export interface Question {
+  question: string;
+  options: string[];
+  correctOptionId: number;
+  explanation: string;
+}
+
 export interface Assessment {
   questions: QuizQuestion[];
   cachedAt?: string;
+}
+
+export interface AssessmentData {
+  questions: Question[];
+  generatedAt: string;
 }
 
 export interface AssessmentResponse {

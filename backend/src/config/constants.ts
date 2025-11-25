@@ -1,11 +1,7 @@
-/**
- * Application-wide constants
- */
-
 export const API_CONFIG = {
   DICODING_BASE_URL: 'https://learncheck-dicoding-mock-666748076441.europe-west1.run.app/api',
   GEMINI_MODEL: 'gemini-2.5-flash',
-  REQUEST_TIMEOUT: 30000, // 30 seconds
+  REQUEST_TIMEOUT: 30000,
 } as const;
 
 export const ERROR_MESSAGES = {

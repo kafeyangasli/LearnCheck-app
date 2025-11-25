@@ -2,13 +2,11 @@ import { GoogleGenAI, Type } from '@google/genai';
 import { API_CONFIG, ERROR_MESSAGES } from '../config/constants';
 import type { Assessment } from '../types/definitions';
 
-// Validate API key exists
 if (!process.env.GEMINI_API_KEY) {
   console.error('[Gemini] CRITICAL: GEMINI_API_KEY not found in environment variables');
   throw new Error('GEMINI_API_KEY is required');
 }
 
-// Initialize with API key explicitly
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
@@ -65,13 +63,6 @@ const assessmentSchema = {
   required: ["questions"]
 };
 
-
-/**
- * Generate assessment questions using Gemini AI
- * @param textContent - Clean text content from tutorial
- * @returns Assessment object with generated questions
- * @throws Error if generation fails or response is empty
- */
 export const generateAssessmentQuestions = async (textContent: string): Promise<Assessment> => {
   const prompt = `
     Berdasarkan konten berikut, buatkan 18 pertanyaan pilihan ganda dalam Bahasa Indonesia untuk menguji pemahaman secara menyeluruh.
@@ -116,19 +107,13 @@ export const generateAssessmentQuestions = async (textContent: string): Promise<
   }
 };
 
-/**
- * Select 3 random questions from a pool of questions
- * @param assessment - Full assessment with 18 questions
- * @returns Assessment with 3 random questions
- */
 export const selectRandomQuestions = (assessment: Assessment): Assessment => {
   const allQuestions = assessment.questions;
 
   if (allQuestions.length <= 3) {
-    return assessment; // Return all if we have 3 or fewer
+    return assessment;
   }
 
-  // Shuffle and select 3 questions using Fisher-Yates algorithm
   const shuffled = [...allQuestions];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

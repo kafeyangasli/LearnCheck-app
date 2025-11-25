@@ -3,10 +3,6 @@ import logger from '../config/logger';
 
 let redisClient: RedisClientType | null = null;
 
-/**
- * Initialize Redis connection
- * Falls back gracefully if Redis is not configured
- */
 export const initializeRedis = async (): Promise<void> => {
   if (!process.env.REDIS_URL) {
     logger.warn('[Redis] REDIS_URL not configured - running without cache');
@@ -15,7 +11,6 @@ export const initializeRedis = async (): Promise<void> => {
 
   try {
     const redisUrl = process.env.REDIS_URL;
-    // Enable TLS if protocol is rediss:// OR if host contains 'upstash.io'
     const isUpstash = redisUrl.includes('upstash.io');
     const isTls = redisUrl.startsWith('rediss://') || isUpstash;
 
@@ -24,7 +19,7 @@ export const initializeRedis = async (): Promise<void> => {
       pingInterval: 1000,
       socket: {
         tls: isTls,
-        rejectUnauthorized: false, // Required for Upstash
+        rejectUnauthorized: false,
         family: 0
       }
     });
@@ -41,22 +36,14 @@ export const initializeRedis = async (): Promise<void> => {
     logger.info('[Redis] Initialization complete');
   } catch (error) {
     logger.error('[Redis] Failed to initialize:', error);
-    redisClient = null; // Fall back to no cache
+    redisClient = null;
   }
 };
 
-/**
- * Check if Redis is available
- */
 export const isRedisAvailable = (): boolean => {
   return redisClient !== null && redisClient.isOpen;
 };
 
-/**
- * Get value from Redis cache
- * @param key - Cache key
- * @returns Cached value or null
- */
 export const getCache = async (key: string): Promise<string | null> => {
   if (!isRedisAvailable()) return null;
 
@@ -74,12 +61,6 @@ export const getCache = async (key: string): Promise<string | null> => {
   }
 };
 
-/**
- * Set value in Redis cache with TTL
- * @param key - Cache key
- * @param value - Value to cache (will be JSON stringified)
- * @param ttlSeconds - Time to live in seconds
- */
 export const setCache = async (
   key: string,
   value: string,
@@ -95,10 +76,6 @@ export const setCache = async (
   }
 };
 
-/**
- * Delete value from Redis cache
- * @param key - Cache key to delete
- */
 export const deleteCache = async (key: string): Promise<void> => {
   if (!isRedisAvailable()) return;
 
@@ -110,11 +87,6 @@ export const deleteCache = async (key: string): Promise<void> => {
   }
 };
 
-/**
- * Check if a key exists in Redis
- * @param key - Cache key to check
- * @returns true if key exists, false otherwise
- */
 export const hasCache = async (key: string): Promise<boolean> => {
   if (!isRedisAvailable()) return false;
 
@@ -127,22 +99,15 @@ export const hasCache = async (key: string): Promise<boolean> => {
   }
 };
 
-/**
- * Increment rate limit counter
- * @param key - Rate limit key (e.g., 'ratelimit:user:123')
- * @param windowSeconds - Time window in seconds
- * @returns Current count after increment
- */
 export const incrementRateLimit = async (
   key: string,
   windowSeconds: number
 ): Promise<number> => {
-  if (!isRedisAvailable()) return 0; // No rate limiting without Redis
+  if (!isRedisAvailable()) return 0;
 
   try {
     const count = await redisClient!.incr(key);
 
-    // Set expiry only on first increment
     if (count === 1) {
       await redisClient!.expire(key, windowSeconds);
     }
@@ -150,13 +115,10 @@ export const incrementRateLimit = async (
     return count;
   } catch (error) {
     logger.error(`[Redis] Rate limit increment error for key ${key}:`, error);
-    return 0; // Fail open - allow request
+    return 0;
   }
 };
 
-/**
- * Close Redis connection (for graceful shutdown)
- */
 export const closeRedis = async (): Promise<void> => {
   if (redisClient && redisClient.isOpen) {
     await redisClient.quit();

@@ -4,7 +4,6 @@ import logger from './config/logger';
 import { closeRedis } from './services/redis.service';
 import { Server } from 'http';
 
-// Load environment variables for local development
 dotenv.config();
 
 const PORT = process.env.PORT || 4000;
@@ -18,7 +17,6 @@ async function startServer() {
   });
 }
 
-// Graceful shutdown
 const gracefulShutdown = async (signal: string) => {
   logger.info(`${signal} signal received: closing HTTP server`);
 
