@@ -12,8 +12,8 @@ let server: Server;
 
 async function startServer() {
   server = app.listen(PORT, () => {
-    logger.info(`🚀 Backend server running on http://localhost:${PORT}`);
-    logger.info(`📡 API endpoint: http://localhost:${PORT}/api/v1`);
+    logger.info(`Backend server running on http://localhost:${PORT}`);
+    logger.info(`API endpoint: http://localhost:${PORT}/api/v1`);
   });
 }
 
