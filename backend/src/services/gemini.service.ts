@@ -1,9 +1,10 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import { API_CONFIG, ERROR_MESSAGES } from '../config/constants';
 import type { Assessment } from '../types/definitions';
+import logger from '../config/logger';
 
 if (!process.env.GEMINI_API_KEY) {
-  console.error('[Gemini] CRITICAL: GEMINI_API_KEY not found in environment variables');
+  logger.error('[Gemini] CRITICAL: GEMINI_API_KEY not found in environment variables');
   throw new Error('GEMINI_API_KEY is required');
 }
 
@@ -11,7 +12,7 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-console.log('[Gemini] SDK initialized successfully');
+logger.info('[Gemini] SDK initialized successfully');
 const assessmentSchema = {
   type: Type.OBJECT,
   properties: {
@@ -102,7 +103,7 @@ export const generateAssessmentQuestions = async (textContent: string): Promise<
 
     return JSON.parse(jsonText) as Assessment;
   } catch (error) {
-    console.error("[Gemini] Error generating assessment:", error);
+    logger.error("[Gemini] Error generating assessment:", error);
     throw new Error(ERROR_MESSAGES.GEMINI_GENERATION_FAILED);
   }
 };
