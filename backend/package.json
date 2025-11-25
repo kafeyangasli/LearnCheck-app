@@ -1,19 +1,9 @@
 {
-  "dependencies": {
-    "axios": "^1.13.2",
-    "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "express-rate-limit": "^8.2.1",
-    "helmet": "^8.1.0",
-    "morgan": "^1.10.1",
-    "redis": "^5.9.0",
-    "winston": "^3.18.3"
-  },
   "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
@@ -25,7 +15,18 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.1",
+    "redis": "^5.9.0",
+    "winston": "^3.18.3"
+  },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",

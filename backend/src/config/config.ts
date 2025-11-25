@@ -13,8 +13,9 @@ interface Config {
     password: string;
     ttl: number;
   };
-  llmService: {
-    url: string;
+  gemini: {
+    apiKey: string;
+    model: string;
   };
   mockDicodingApi: {
     url: string;
@@ -42,8 +43,9 @@ const config: Config = {
     password: process.env.REDIS_PASSWORD || '',
     ttl: parseInt(process.env.REDIS_TTL || '3600'),
   },
-  llmService: {
-    url: process.env.LLM_SERVICE_URL || 'http://localhost:3002',
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY || '',
+    model: process.env.GEMINI_MODEL || 'gemini-2.0-flash-exp',
   },
   mockDicodingApi: {
     url: process.env.MOCK_DICODING_API_URL || 'https://learncheck-dicoding-mock-666748076441.europe-west1.run.app',
