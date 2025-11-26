@@ -4,9 +4,7 @@ import useQuizData from './hooks/useQuizData';
 import { Question } from './types';
 import Loader from './components/ui/Loader';
 import SkeletonLoading from './components/ui/SkeletonLoading';
-// import { prepareQuiz } from './services/api'; // Disabled to prevent rate limiting
 
-// Imported Components
 import QuizContainer from './components/layout/QuizContainer';
 import Intro from './features/quiz/Intro';
 import Quiz from './features/quiz/Quiz';
@@ -31,23 +29,20 @@ const App: React.FC = () => {
   const reset = useQuizStore(state => state.reset);
 
   const handleStartQuiz = async () => {
-    // Prevent double-click and concurrent quiz generation
     if (isGeneratingQuiz || quizStarted) return;
 
-    // Reset quiz state before starting fresh quiz
     reset();
 
     setQuizStarted(true);
-    await generateQuiz(); // First attempt: use cache if available
+    await generateQuiz();
   };
 
   const handleTryAgain = async () => {
     reset();
     setQuizStarted(false);
-    // Small delay for UI transition
     await new Promise(resolve => setTimeout(resolve, 100));
     setQuizStarted(true);
-    await generateQuiz(true); // Retry: skip cache, generate fresh questions
+    await generateQuiz(true);
   };
 
   const handleGoToIntro = () => {
@@ -58,11 +53,6 @@ const App: React.FC = () => {
   useEffect(() => {
     if (userId && tutorialId) {
       initialize(userId, tutorialId);
-
-      // Trigger background quiz generation when page loads
-      // prepareQuiz(tutorialId).catch((err) => {
-      //   console.warn('[App] Failed to prepare quiz:', err);
-      // });
     }
   }, [userId, tutorialId, initialize]);
 
@@ -74,17 +64,15 @@ const App: React.FC = () => {
 
   const quizKey = useMemo(() => `${userId}-${tutorialId}`, [userId, tutorialId]);
 
-  // Detect if running in iframe (embedded mode)
   const isEmbedded = useMemo(() => {
     try {
       return window.self !== window.top;
     } catch (e) {
-      return true; // If we can't access top, we're probably in an iframe
+      return true;
     }
   }, []);
 
   const renderContent = () => {
-    // Check for missing required params
     if (!tutorialId || !userId) {
       return (
         <div className="text-red-500 p-4 text-center font-bold space-y-2">
@@ -105,7 +93,6 @@ const App: React.FC = () => {
       return <Intro onStart={handleStartQuiz} isLoading={isLoadingPreferences || isGeneratingQuiz} />;
     }
 
-    // Show skeleton loading while fetching quiz from cache (much faster!)
     if (quizStarted && isGeneratingQuiz) {
       return <SkeletonLoading />;
     }

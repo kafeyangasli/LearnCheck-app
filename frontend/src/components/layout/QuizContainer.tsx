@@ -9,7 +9,6 @@ interface QuizContainerProps {
 
 const QuizContainer: React.FC<QuizContainerProps> = ({ preferences, children, isEmbedded = false }) => {
 
-  // Apply theme class to HTML element for dark mode
   useEffect(() => {
     const root = window.document.documentElement;
     if (preferences.theme === 'dark') {
@@ -43,7 +42,6 @@ const QuizContainer: React.FC<QuizContainerProps> = ({ preferences, children, is
       containerClasses.push('font-mono');
       break;
     default:
-      // default font is sans-serif via tailwind base styles
       break;
   }
 

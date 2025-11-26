@@ -7,13 +7,11 @@ const LoadingState: React.FC = () => {
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) {
-          // Slow down near completion for smoother UX
           return Math.min(prev + 1, 95);
         }
-        // Faster initial progress for better perceived performance
         return prev + 8;
       });
-    }, 200); // Smooth 200ms updates
+    }, 200);
 
     return () => clearInterval(interval);
   }, []);
