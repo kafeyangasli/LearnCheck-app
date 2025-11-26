@@ -1,62 +1,29 @@
-import axios from 'axios';
-import type { QuestionResponse } from '../types';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import axios from 'axios';
+
+// TODO: Replace with environment variable for production
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4002/api/v1';
 
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-export const learnCheckApi = {
-  // Generate questions (Adapted for new Backend)
-  generateQuestions: async (
-    tutorial_id: string,
-    user_id: string,
-    attempt_number: number
-  ): Promise<QuestionResponse> => {
-    // New Backend Endpoint: GET /api/v1/assessment
-    const response = await api.get('/api/v1/assessment', {
-      params: { tutorial_id, user_id }
-    });
-
-    const newQuestions = response.data.assessment.questions;
-
-    // Map new structure to old structure
-    const mappedQuestions = newQuestions.map((q: any) => ({
-      question_id: q.id,
-      question: q.questionText,
-      // Map options to simple strings for compatibility, OR keep objects if components handle it
-      // For now, let's keep the objects but cast them, as we updated the type
-      options: q.options.map((opt: any) => opt.text),
-      difficulty: 'medium', // Default since new API doesn't return difficulty per question
-      correctOptionId: q.correctOptionId,
-      explanation: q.explanation,
-      _rawOptions: q.options // Store raw options to find correct ID later
-    }));
-
-    return {
-      status: 'success',
-      data: {
-        questions: mappedQuestions,
-        tutorial_id,
-        user_id,
-        attempt_number,
-        difficulty: 'medium'
-      }
-    };
-  },
-
-  // Submit answer (Local Mock)
-  // submitAnswer removed as validation is now local
-
-  // Save progress (Mock - No endpoint yet)
-  // saveProgress removed as backend doesn't support it
-
-  // Get progress (Mock - No endpoint yet)
-  // getProgress removed as backend doesn't support it
+/**
+ * Trigger background quiz generation (non-blocking)
+ * Call this when user opens the tutorial page
+ * @param tutorialId - Tutorial identifier
+ */
+export const prepareQuiz = async (tutorialId: string): Promise<void> => {
+  try {
+    await api.post('/assessment/prepare', { tutorial_id: tutorialId });
+    console.log('[API] Background quiz generation triggered');
+  } catch (error) {
+    // Silent fail - this is optional optimization
+    console.warn('[API] Failed to trigger background generation:', error);
+  }
 };
 
 export default api;
