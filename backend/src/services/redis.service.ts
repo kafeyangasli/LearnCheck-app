@@ -1,18 +1,19 @@
-import { createClient, RedisClientType } from 'redis';
-import logger from '../config/logger';
+import { createClient, RedisClientType } from "redis";
+import logger from "../config/logger";
 
 let redisClient: RedisClientType | null = null;
 
 export const initializeRedis = async (): Promise<void> => {
   if (!process.env.REDIS_URL) {
-    logger.warn('[Redis] REDIS_URL not configured - running without cache');
+    logger.warn("[Redis] REDIS_URL not configured - running without cache");
+
     return;
   }
 
   try {
     const redisUrl = process.env.REDIS_URL;
-    const isUpstash = redisUrl.includes('upstash.io');
-    const isTls = redisUrl.startsWith('rediss://') || isUpstash;
+    const isUpstash = redisUrl.includes("upstash.io");
+    const isTls = redisUrl.startsWith("rediss://") || isUpstash;
 
     redisClient = createClient({
       url: redisUrl,
@@ -20,22 +21,19 @@ export const initializeRedis = async (): Promise<void> => {
       socket: {
         tls: isTls,
         rejectUnauthorized: false,
-        family: 0
-      }
+        family: 0,
+      },
     });
-
-    redisClient.on('error', (err: Error) => {
-      logger.error('[Redis] Client error:', err);
+    redisClient.on("error", (err: Error) => {
+      logger.error("[Redis] Client error:", err);
     });
-
-    redisClient.on('connect', () => {
-      logger.info('[Redis] Connected successfully');
+    redisClient.on("connect", () => {
+      logger.info("[Redis] Connected successfully");
     });
-
     await redisClient.connect();
-    logger.info('[Redis] Initialization complete');
+    logger.info("[Redis] Initialization complete");
   } catch (error) {
-    logger.error('[Redis] Failed to initialize:', error);
+    logger.error("[Redis] Failed to initialize:", error);
     redisClient = null;
   }
 };
@@ -49,14 +47,17 @@ export const getCache = async (key: string): Promise<string | null> => {
 
   try {
     const value = await redisClient!.get(key);
+
     if (value) {
       logger.debug(`[Redis] Cache HIT for key: ${key}`);
     } else {
       logger.debug(`[Redis] Cache MISS for key: ${key}`);
     }
+
     return value;
   } catch (error) {
     logger.error(`[Redis] Get error for key ${key}:`, error);
+
     return null;
   }
 };
@@ -64,7 +65,7 @@ export const getCache = async (key: string): Promise<string | null> => {
 export const setCache = async (
   key: string,
   value: string,
-  ttlSeconds: number
+  ttlSeconds: number,
 ): Promise<void> => {
   if (!isRedisAvailable()) return;
 
@@ -92,16 +93,18 @@ export const hasCache = async (key: string): Promise<boolean> => {
 
   try {
     const exists = await redisClient!.exists(key);
+
     return exists === 1;
   } catch (error) {
     logger.error(`[Redis] Exists check error for key ${key}:`, error);
+
     return false;
   }
 };
 
 export const incrementRateLimit = async (
   key: string,
-  windowSeconds: number
+  windowSeconds: number,
 ): Promise<number> => {
   if (!isRedisAvailable()) return 0;
 
@@ -115,6 +118,7 @@ export const incrementRateLimit = async (
     return count;
   } catch (error) {
     logger.error(`[Redis] Rate limit increment error for key ${key}:`, error);
+
     return 0;
   }
 };
@@ -122,6 +126,6 @@ export const incrementRateLimit = async (
 export const closeRedis = async (): Promise<void> => {
   if (redisClient && redisClient.isOpen) {
     await redisClient.quit();
-    logger.info('[Redis] Connection closed');
+    logger.info("[Redis] Connection closed");
   }
 };
