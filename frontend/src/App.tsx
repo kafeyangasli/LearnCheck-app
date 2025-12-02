@@ -51,9 +51,37 @@ function App() {
     initializeApp();
   }, []);
 
+  const isDark = preferences?.theme === "dark";
+
+  // Font size classes
+  const getFontSizeClass = () => {
+    if (!preferences) return "text-base";
+    switch (preferences.fontSize) {
+      case "small":
+        return "text-sm";
+      case "large":
+        return "text-lg";
+      default:
+        return "text-base";
+    }
+  };
+
+  // Font family classes
+  const getFontFamilyClass = () => {
+    if (!preferences) return "font-sans";
+    switch (preferences.fontStyle) {
+      case "serif":
+        return "font-serif";
+      case "monospace":
+        return "font-mono";
+      default:
+        return "font-sans";
+    }
+  };
+
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 max-w-lg">
           <div className="flex items-center gap-3 mb-4">
             <AlertTriangle className="w-8 h-8 text-warning" />
@@ -92,9 +120,15 @@ function App() {
 
   if (loading || !params || !preferences) {
     return (
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center">
+      <div
+        className={`min-h-screen flex flex-col items-center justify-center ${isDark ? "bg-dark-bg" : "bg-slate-100"}`}
+      >
         <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-        <p className="text-gray-600 font-medium">Memuat...</p>
+        <p
+          className={`font-medium ${isDark ? "text-dark-text-muted" : "text-gray-600"}`}
+        >
+          Memuat...
+        </p>
       </div>
     );
   }
@@ -102,15 +136,18 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div
-        className={`min-h-screen bg-gray-100 ${inIframe ? "p-2" : "p-4"}`}
-        data-theme={preferences.theme}
-        data-font-size={preferences.fontSize}
-        data-font-style={preferences.fontStyle}
-        data-layout-width={preferences.layoutWidth}
+        className={`
+          min-h-screen transition-colors duration-200
+          ${isDark ? "bg-dark-bg" : "bg-slate-100"}
+          ${getFontSizeClass()}
+          ${getFontFamilyClass()}
+          ${inIframe ? "p-2" : "p-4"}
+        `}
       >
         <QuizContainer
           tutorialId={params.tutorial_id}
           userId={params.user_id}
+          isDark={isDark}
         />
       </div>
     </QueryClientProvider>

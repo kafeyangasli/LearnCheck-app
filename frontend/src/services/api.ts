@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { QuestionResponse } from "../types";
+import type { QuestionResponse, UserPreferences } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
@@ -66,13 +66,39 @@ export const learnCheckApi = {
     };
   },
 
-  getUserPreferences: async (_user_id: string) => {
-    return {
-      theme: "light" as const,
-      fontSize: "medium" as const,
-      fontStyle: "default" as const,
-      layoutWidth: "centered" as const,
-    };
+  getUserPreferences: async (user_id: string): Promise<UserPreferences> => {
+    try {
+      const response = await api.get("/api/v1/preferences", {
+        params: { user_id },
+      });
+
+      if (response.data?.userPreferences) {
+        const pref = response.data.userPreferences;
+        return {
+          theme: pref.theme || "light",
+          fontSize: pref.fontSize || "medium",
+          fontStyle: pref.fontStyle || "default",
+          layoutWidth: pref.layoutWidth || "centered",
+        };
+      }
+
+      // Return defaults if response format is unexpected
+      return {
+        theme: "light",
+        fontSize: "medium",
+        fontStyle: "default",
+        layoutWidth: "centered",
+      };
+    } catch (error) {
+      console.error("Failed to fetch user preferences:", error);
+      // Return defaults on error
+      return {
+        theme: "light",
+        fontSize: "medium",
+        fontStyle: "default",
+        layoutWidth: "centered",
+      };
+    }
   },
 };
 

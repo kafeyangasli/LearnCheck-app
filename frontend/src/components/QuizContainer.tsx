@@ -9,9 +9,14 @@ import ResultCard from "./ResultCard";
 interface QuizContainerProps {
   tutorialId: string;
   userId: string;
+  isDark?: boolean;
 }
 
-const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
+const QuizContainer = ({
+  tutorialId,
+  userId,
+  isDark = false,
+}: QuizContainerProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +43,21 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       setLoading(true);
       setError(null);
 
+      console.log(
+        "[QuizContainer] loadQuestions called with newSession:",
+        newSession,
+      );
+
       const response = await learnCheckApi.generateQuestions(
         tutorialId,
         userId,
         1,
         newSession,
+      );
+
+      console.log(
+        "[QuizContainer] Questions received:",
+        response.data.questions.length,
       );
 
       setQuestions(response.data.questions);
@@ -163,6 +178,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   };
 
   const handleRetry = () => {
+    console.log("[QuizContainer] handleRetry called - requesting new session");
     setQuizState({
       currentQuestionIndex: 0,
       selectedAnswers: [],
@@ -181,12 +197,23 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   if (error) {
     return (
       <div className="min-h-[400px] flex flex-col items-center justify-center">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 max-w-md text-center">
+        <div
+          className={`
+            max-w-md mx-auto rounded-xl shadow-lg border p-8 text-center
+            ${isDark ? "bg-dark-card border-dark-border" : "bg-white border-gray-200"}
+          `}
+        >
           <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+          <h3
+            className={`text-lg font-semibold mb-2 ${isDark ? "text-dark-text" : "text-gray-800"}`}
+          >
             Terjadi Kesalahan
           </h3>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p
+            className={`mb-6 ${isDark ? "text-dark-text-muted" : "text-gray-600"}`}
+          >
+            {error}
+          </p>
           <button
             onClick={() => loadQuestions(false)}
             className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all"
@@ -203,11 +230,14 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   if (showIntro) {
     return (
       <div className="py-8 px-4">
-        <IntroCard
-          totalQuestions={questions.length > 0 ? questions.length : 3}
-          isLoading={loading}
-          onStart={handleStartQuiz}
-        />
+        <div className="max-w-2xl mx-auto">
+          <IntroCard
+            totalQuestions={questions.length > 0 ? questions.length : 3}
+            isLoading={loading}
+            onStart={handleStartQuiz}
+            isDark={isDark}
+          />
+        </div>
       </div>
     );
   }
@@ -216,11 +246,14 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   if (quizState.isCompleted) {
     return (
       <div className="py-8 px-4">
-        <ResultCard
-          score={quizState.score}
-          totalQuestions={questions.length}
-          onRetry={handleRetry}
-        />
+        <div className="max-w-2xl mx-auto">
+          <ResultCard
+            score={quizState.score}
+            totalQuestions={questions.length}
+            onRetry={handleRetry}
+            isDark={isDark}
+          />
+        </div>
       </div>
     );
   }
@@ -231,19 +264,24 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   return (
     <div className="py-8 px-4">
-      <QuestionCard
-        question={currentQuestion}
-        questionNumber={quizState.currentQuestionIndex + 1}
-        totalQuestions={questions.length}
-        selectedAnswer={selectedAnswer}
-        onAnswerSelect={handleAnswerSelect}
-        onSubmit={handleSubmitAnswer}
-        onNext={handleNextQuestion}
-        showFeedback={quizState.showFeedback}
-        isCorrect={quizState.isCorrect}
-        feedback={quizState.feedback}
-        isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
-      />
+      <div className="max-w-2xl mx-auto">
+        <QuestionCard
+          question={currentQuestion}
+          questionNumber={quizState.currentQuestionIndex + 1}
+          totalQuestions={questions.length}
+          selectedAnswer={selectedAnswer}
+          onAnswerSelect={handleAnswerSelect}
+          onSubmit={handleSubmitAnswer}
+          onNext={handleNextQuestion}
+          showFeedback={quizState.showFeedback}
+          isCorrect={quizState.isCorrect}
+          feedback={quizState.feedback}
+          isLastQuestion={
+            quizState.currentQuestionIndex === questions.length - 1
+          }
+          isDark={isDark}
+        />
+      </div>
     </div>
   );
 };

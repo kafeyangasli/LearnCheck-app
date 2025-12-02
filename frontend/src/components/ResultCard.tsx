@@ -5,6 +5,7 @@ interface ResultCardProps {
   totalQuestions: number;
   onRetry: () => void;
   onHome?: () => void;
+  isDark?: boolean;
 }
 
 const ResultCard = ({
@@ -12,6 +13,7 @@ const ResultCard = ({
   totalQuestions,
   onRetry,
   onHome,
+  isDark = false,
 }: ResultCardProps) => {
   const percentage = Math.round((score / totalQuestions) * 100);
 
@@ -32,41 +34,80 @@ const ResultCard = ({
     if (onHome) {
       onHome();
     } else {
-      // Default: send message to parent window or navigate
       window.parent.postMessage({ type: "NAVIGATE_HOME" }, "*");
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden max-w-2xl mx-auto">
+    <div
+      className={`
+        rounded-2xl shadow-lg border overflow-hidden
+        ${isDark ? "bg-dark-card border-dark-border" : "bg-white border-gray-200"}
+      `}
+    >
       <div className="p-8">
         {/* Title */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Hasil Akhir</h1>
+        <h1
+          className={`text-2xl font-bold mb-8 ${isDark ? "text-dark-text" : "text-gray-900"}`}
+        >
+          Hasil Akhir
+        </h1>
 
         {/* Stats Table */}
-        <div className="grid grid-cols-3 divide-x divide-gray-200 border-y border-gray-200 py-6 mb-8">
+        <div
+          className={`
+            grid grid-cols-3 divide-x py-6 mb-8 border-y
+            ${isDark ? "divide-dark-border border-dark-border" : "divide-gray-200 border-gray-200"}
+          `}
+        >
           {/* Total Soal */}
           <div className="text-center px-4">
-            <p className="text-gray-600 font-medium mb-2">Total Soal</p>
-            <p className="text-4xl font-bold text-gray-900">{totalQuestions}</p>
+            <p
+              className={`font-medium mb-2 ${isDark ? "text-dark-text-muted" : "text-gray-600"}`}
+            >
+              Total Soal
+            </p>
+            <p
+              className={`text-4xl font-bold ${isDark ? "text-dark-text" : "text-gray-900"}`}
+            >
+              {totalQuestions}
+            </p>
           </div>
 
           {/* Jawaban Benar */}
           <div className="text-center px-4">
-            <p className="text-gray-600 font-medium mb-2">Jawaban Benar</p>
-            <p className="text-4xl font-bold text-gray-900">{score}</p>
+            <p
+              className={`font-medium mb-2 ${isDark ? "text-dark-text-muted" : "text-gray-600"}`}
+            >
+              Jawaban Benar
+            </p>
+            <p
+              className={`text-4xl font-bold ${isDark ? "text-dark-text" : "text-gray-900"}`}
+            >
+              {score}
+            </p>
           </div>
 
           {/* Nilai Akhir */}
           <div className="text-center px-4">
-            <p className="text-gray-600 font-medium mb-2">Nilai Akhir</p>
-            <p className="text-4xl font-bold text-gray-900">{percentage}%</p>
+            <p
+              className={`font-medium mb-2 ${isDark ? "text-dark-text-muted" : "text-gray-600"}`}
+            >
+              Nilai Akhir
+            </p>
+            <p
+              className={`text-4xl font-bold ${isDark ? "text-dark-text" : "text-gray-900"}`}
+            >
+              {percentage}%
+            </p>
           </div>
         </div>
 
         {/* Message */}
         <div className="mb-8">
-          <p className="text-gray-700 text-sm leading-relaxed">
+          <p
+            className={`text-sm leading-relaxed ${isDark ? "text-dark-text-muted" : "text-gray-700"}`}
+          >
             {getMessage()}
           </p>
         </div>
@@ -75,7 +116,14 @@ const ResultCard = ({
         <div className="flex justify-end gap-3">
           <button
             onClick={onRetry}
-            className="inline-flex items-center gap-2 px-6 py-2.5 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold text-sm transition-all hover:bg-gray-50 hover:border-gray-400"
+            className={`
+              inline-flex items-center gap-2 px-6 py-2.5 border-2 rounded-lg font-semibold text-sm transition-all
+              ${
+                isDark
+                  ? "border-dark-border text-dark-text hover:bg-dark-secondary"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400"
+              }
+            `}
           >
             <RotateCcw className="w-4 h-4" />
             Coba Lagi
