@@ -1,13 +1,12 @@
-import app from './app';
-import dotenv from 'dotenv';
-import logger from './config/logger';
-import { closeRedis } from './services/redis.service';
-import { Server } from 'http';
+import app from "./app";
+import dotenv from "dotenv";
+import logger from "./config/logger";
+import { closeRedis } from "./services/redis.service";
+import { closeQueueConnection } from "./config/queue";
+import { Server } from "http";
 
 dotenv.config();
-
 const PORT = process.env.PORT || 4000;
-
 let server: Server;
 
 async function startServer() {
@@ -22,8 +21,9 @@ const gracefulShutdown = async (signal: string) => {
 
   if (server) {
     server.close(async () => {
-      logger.info('HTTP server closed');
+      logger.info("HTTP server closed");
       await closeRedis();
+      await closeQueueConnection();
       process.exit(0);
     });
   } else {
@@ -31,11 +31,11 @@ const gracefulShutdown = async (signal: string) => {
   }
 };
 
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("unhandledRejection", (err: Error) => {
+  logger.error("UNHANDLED REJECTION! Shutting down...", err);
 
-process.on('unhandledRejection', (err: Error) => {
-  logger.error('UNHANDLED REJECTION! Shutting down...', err);
   if (server) {
     server.close(() => {
       process.exit(1);
@@ -44,5 +44,4 @@ process.on('unhandledRejection', (err: Error) => {
     process.exit(1);
   }
 });
-
 startServer();

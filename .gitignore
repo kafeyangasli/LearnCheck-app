@@ -148,6 +148,7 @@ logs/
 # Testing
 coverage/
 .nyc_output/
+backend/tests/
 
 # Temporary files
 tmp/

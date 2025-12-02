@@ -5,6 +5,12 @@ export const QUIZ_CONFIG = {
   POSTMESSAGE_DELAY_MS: 300,
 } as const;
 
+export const POLLING_CONFIG = {
+  INTERVAL_MS: 3000, // Poll every 3 seconds
+  MAX_TIMEOUT_MS: 60000, // Maximum 60 seconds before giving up
+  MAX_RETRIES: 20, // 60s / 3s = 20 retries
+} as const;
+
 export const STORAGE_CONFIG = {
   KEY_PREFIX: 'learncheck',
 } as const;
@@ -12,6 +18,11 @@ export const STORAGE_CONFIG = {
 export const API_ENDPOINTS = {
   PREFERENCES: '/preferences',
   ASSESSMENT: '/assessment',
+} as const;
+
+export const HTTP_STATUS = {
+  OK: 200,
+  ACCEPTED: 202,
 } as const;
 
 export const THEME_OPTIONS = ['dark', 'light'] as const;

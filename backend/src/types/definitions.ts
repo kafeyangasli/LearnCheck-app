@@ -1,8 +1,8 @@
 export interface UserPreferences {
-  theme: 'dark' | 'light';
-  fontSize: 'small' | 'medium' | 'large';
-  fontStyle: 'default' | 'serif' | 'mono';
-  layoutWidth: 'fullWidth' | 'standard';
+  theme: "dark" | "light";
+  fontSize: "small" | "medium" | "large";
+  fontStyle: "default" | "serif" | "mono";
+  layoutWidth: "fullWidth" | "standard";
 }
 
 export interface UserPreference {
@@ -54,4 +54,44 @@ export interface PreferencesResponse {
 export interface ErrorResponse {
   error: string;
   message: string;
+}
+
+export interface AssessmentJobData {
+  tutorialId: string;
+  userId: string;
+  skipCache: boolean;
+}
+
+export type JobStatus = "pending" | "processing" | "completed" | "failed";
+
+export interface JobResultBase {
+  status: JobStatus;
+}
+
+export interface JobResultPending extends JobResultBase {
+  status: "pending" | "processing";
+  message: string;
+  jobId: string;
+}
+
+export interface JobResultCompleted extends JobResultBase {
+  status: "completed";
+  data: AssessmentResponse;
+  completedAt: string;
+}
+
+export interface JobResultFailed extends JobResultBase {
+  status: "failed";
+  error: string;
+  failedAt: string;
+}
+
+export type JobResult = JobResultPending | JobResultCompleted | JobResultFailed;
+
+export interface AcceptedResponse {
+  status: "accepted";
+  message: string;
+  jobId: string;
+  tutorialId: string;
+  userId: string;
 }
