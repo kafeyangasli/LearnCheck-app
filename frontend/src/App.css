@@ -1,4 +1,5 @@
 :root {
+    /* Default theme colors (light) */
     --primary-color: #3b82f6;
     --primary-hover: #2563eb;
     --success-color: #10b981;
@@ -12,6 +13,13 @@
     --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     --shadow-lg:
         0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    
+    /* User preferences (set dynamically) */
+    --base-font-size: 16px;
+    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+    --max-width: 800px;
 }
 
 * {
@@ -21,10 +29,8 @@
 }
 
 body {
-    font-family:
-        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-        "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-        sans-serif;
+    font-family: var(--font-family);
+    font-size: var(--base-font-size);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: var(--bg-color);
@@ -44,7 +50,7 @@ body {
 
 /* Quiz Container */
 .quiz-container {
-    max-width: 800px;
+    max-width: var(--max-width);
     margin: 0 auto;
 }
 

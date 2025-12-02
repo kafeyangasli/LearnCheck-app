@@ -1,5 +1,4 @@
-import React from "react";
-import type { Question } from '../types';
+import type { Question } from "../types";
 
 interface QuestionCardProps {
   question: Question;
@@ -33,14 +32,14 @@ const QuestionCard = ({
         {question.options.map((option, index) => (
           <button
             key={index}
-            className={`option-button ${selectedAnswer === index ? 'selected' : ''}`}
+            className={`option-button ${selectedAnswer === index ? "selected" : ""}`}
             onClick={() => onAnswerSelect(index)}
           >
             <span className="option-letter">
               {String.fromCharCode(65 + index)}
             </span>
             <span className="option-text">
-              {typeof option === 'object' ? (option as any).text : option}
+              {typeof option === "object" ? (option as any).text : option}
             </span>
           </button>
         ))}

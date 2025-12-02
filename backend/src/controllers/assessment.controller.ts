@@ -5,6 +5,8 @@ import {
   getJobResult,
   addAssessmentJob,
   getCachedAssessment,
+  getActiveSession,
+  clearActiveSession,
 } from "../services/assessment.service";
 import { ERROR_MESSAGES, HTTP_STATUS } from "../config/constants";
 
@@ -51,7 +53,7 @@ export const getAssessment = async (
   next: NextFunction,
 ) => {
   try {
-    const { tutorial_id, user_id, fresh } = req.query;
+    const { tutorial_id, user_id, fresh, new_session } = req.query;
     const tutorialIdValidation = IdSchema.safeParse(tutorial_id);
     const userIdValidation = IdSchema.safeParse(user_id);
 
@@ -72,7 +74,34 @@ export const getAssessment = async (
     const validTutorialId = tutorialIdValidation.data;
     const validUserId = userIdValidation.data;
     const skipCache = fresh === "true";
+    const isNewSession = new_session === "true";
     const jobId = `${validUserId}-${validTutorialId}`;
+
+    if (isNewSession) {
+      await clearActiveSession(validTutorialId, validUserId);
+    }
+
+    if (!isNewSession) {
+      const activeSession = await getActiveSession(
+        validTutorialId,
+        validUserId,
+      );
+      if (activeSession) {
+        return res.status(HTTP_STATUS.OK).json(activeSession);
+      }
+    }
+
+    if (!skipCache) {
+      const cachedAssessment = await getCachedAssessment(
+        validTutorialId,
+        validUserId,
+      );
+
+      if (cachedAssessment) {
+        return res.status(HTTP_STATUS.OK).json(cachedAssessment);
+      }
+    }
+
     const jobResult = await getJobResult(validTutorialId, validUserId);
 
     if (jobResult) {
@@ -86,17 +115,6 @@ export const getAssessment = async (
           message: "An unexpected error occurred during quiz generation",
           canRetry: true,
         });
-      }
-    }
-
-    if (!skipCache) {
-      const cachedAssessment = await getCachedAssessment(
-        validTutorialId,
-        validUserId,
-      );
-
-      if (cachedAssessment) {
-        return res.status(HTTP_STATUS.OK).json(cachedAssessment);
       }
     }
 

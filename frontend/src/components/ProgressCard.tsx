@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ProgressCardProps {
   currentQuestion: number;
   totalQuestions: number;
@@ -22,9 +20,7 @@ const ProgressCard = ({
           <span className="progress-label">
             Question {currentQuestion} of {totalQuestions}
           </span>
-          <span className="attempt-label">
-            Attempt #{attemptNumber}
-          </span>
+          <span className="attempt-label">Attempt #{attemptNumber}</span>
         </div>
         <div className="score-info">
           <span className="score-label">Score: {score}</span>
@@ -32,10 +28,7 @@ const ProgressCard = ({
       </div>
 
       <div className="progress-bar-container">
-        <div
-          className="progress-bar"
-          style={{ width: `${progress}%` }}
-        ></div>
+        <div className="progress-bar" style={{ width: `${progress}%` }}></div>
       </div>
     </div>
   );

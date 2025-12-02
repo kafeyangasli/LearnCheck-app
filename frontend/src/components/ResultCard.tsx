@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ResultCardProps {
   score: number;
   totalQuestions: number;
@@ -10,22 +8,28 @@ const ResultCard = ({ score, totalQuestions, onRetry }: ResultCardProps) => {
   const percentage = Math.round((score / totalQuestions) * 100);
 
   const getResultMessage = () => {
-    if (percentage === 100) return 'Perfect! 🎉';
-    if (percentage >= 80) return 'Excellent! 🌟';
-    if (percentage >= 60) return 'Good Job! 👍';
-    return 'Keep Learning! 📚';
+    if (percentage === 100) return "Perfect! 🎉";
+    if (percentage >= 80) return "Excellent! 🌟";
+    if (percentage >= 60) return "Good Job! 👍";
+    return "Keep Learning! 📚";
   };
 
   const getResultColor = () => {
-    if (percentage >= 80) return 'success';
-    if (percentage >= 60) return 'warning';
-    return 'danger';
+    if (percentage >= 80) return "success";
+    if (percentage >= 60) return "warning";
+    return "danger";
   };
 
   return (
     <div className={`result-card result-${getResultColor()}`}>
       <div className="result-icon">
-        {percentage === 100 ? '🏆' : percentage >= 80 ? '🌟' : percentage >= 60 ? '👍' : '📚'}
+        {percentage === 100
+          ? "🏆"
+          : percentage >= 80
+            ? "🌟"
+            : percentage >= 60
+              ? "👍"
+              : "📚"}
       </div>
 
       <h2 className="result-title">{getResultMessage()}</h2>
@@ -40,7 +44,8 @@ const ResultCard = ({ score, totalQuestions, onRetry }: ResultCardProps) => {
 
       <div className="result-message">
         <p>
-          You answered <strong>{score}</strong> out of <strong>{totalQuestions}</strong> questions correctly.
+          You answered <strong>{score}</strong> out of{" "}
+          <strong>{totalQuestions}</strong> questions correctly.
         </p>
       </div>
 

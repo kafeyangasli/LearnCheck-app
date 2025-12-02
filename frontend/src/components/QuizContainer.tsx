@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { learnCheckApi } from "../services/api";
 import type { Question, QuizState } from "../types";
 import QuestionCard from "./QuestionCard";
@@ -30,10 +30,10 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   // Load questions on mount
   useEffect(() => {
-    loadQuestions();
+    loadQuestions(false); // false = bukan session baru (reload halaman)
   }, []);
 
-  const loadQuestions = async () => {
+  const loadQuestions = async (newSession: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
@@ -42,10 +42,12 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       setAttemptNumber(1);
 
       // Generate questions
+      // newSession = true saat klik "Try Again", false saat reload halaman
       const response = await learnCheckApi.generateQuestions(
         tutorialId,
         userId,
         1, // attempt_number
+        newSession, // true = minta soal baru, false = lanjut soal yang sama
       );
 
       setQuestions(response.data.questions);
@@ -55,8 +57,17 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         startTime: Date.now(),
       }));
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load questions");
+      const errorMessage =
+        err.message ||
+        err.response?.data?.message ||
+        "Failed to load questions";
+      setError(errorMessage);
       console.error("Error loading questions:", err);
+      console.error("Error details:", {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+      });
     } finally {
       setLoading(false);
     }
@@ -90,7 +101,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       "Tepat sekali! ",
       "Keren, kamu paham konsepnya! ",
       "Betul! Lanjutkan momentum belajarmu! ",
-      "Luar biasa, pemahamanmu solid! "
+      "Luar biasa, pemahamanmu solid! ",
     ];
 
     const incorrectPrefixes = [
@@ -98,7 +109,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       "Belum tepat, tapi jangan khawatir, ini bagian dari belajar. ",
       "Oops, masih kurang pas. Yuk kita bedah bareng! ",
       "Sedikit lagi! Coba perhatikan penjelasan berikut. ",
-      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. "
+      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. ",
     ];
 
     if (currentQuestion._rawOptions && currentQuestion.correctOptionId) {
@@ -108,23 +119,28 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       // Smart Feedback Generation
       const prefix = isCorrect
         ? correctPrefixes[Math.floor(Math.random() * correctPrefixes.length)]
-        : incorrectPrefixes[Math.floor(Math.random() * incorrectPrefixes.length)];
+        : incorrectPrefixes[
+            Math.floor(Math.random() * incorrectPrefixes.length)
+          ];
 
       // Parse Explanation & Hint
       const rawExplanation = currentQuestion.explanation || "";
-      const explanationParts = rawExplanation.split('Hint:');
+      const explanationParts = rawExplanation.split("Hint:");
       const mainExplanation = explanationParts[0].trim();
-      const hintText = explanationParts.length > 1 ? explanationParts[1].trim() : null;
+      const hintText =
+        explanationParts.length > 1 ? explanationParts[1].trim() : null;
 
       // Combine for WS 1 UI
       feedback = `${prefix}\n\n${mainExplanation}`;
       if (hintText) {
         feedback += `\n\n💡 Hint: ${hintText}`;
       }
-
     } else {
       // Fallback for legacy or missing data
-      console.warn("Missing validation data for question", currentQuestion.question_id);
+      console.warn(
+        "Missing validation data for question",
+        currentQuestion.question_id,
+      );
       feedback = "Feedback unavailable";
     }
 
@@ -172,7 +188,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       isCompleted: false,
       startTime: Date.now(),
     });
-    loadQuestions();
+    loadQuestions(true); // true = minta soal baru saat Try Again
   };
 
   if (loading) {
@@ -192,7 +208,10 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         <div className="error-state">
           <h3>❌ Error</h3>
           <p>{error}</p>
-          <button onClick={loadQuestions} className="btn btn-primary">
+          <button
+            onClick={() => loadQuestions(false)}
+            className="btn btn-primary"
+          >
             Retry
           </button>
         </div>
