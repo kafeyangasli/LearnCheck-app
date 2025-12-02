@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { learnCheckApi } from "../services/api";
 import type { Question, QuizState } from "../types";
 import QuestionCard from "./QuestionCard";
@@ -28,10 +28,44 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     startTime: Date.now(),
   });
 
-  // Load questions on mount
+  // Storage key for persistence
+  const STORAGE_KEY = `quiz_state_${tutorialId}_${userId}`;
+
+  // Load questions and state on mount
   useEffect(() => {
+    const savedState = localStorage.getItem(STORAGE_KEY);
+
+    if (savedState) {
+      try {
+        const { questions: savedQuestions, quizState: savedQuizState, attemptNumber: savedAttempt } = JSON.parse(savedState);
+
+        if (savedQuestions && savedQuestions.length > 0) {
+          setQuestions(savedQuestions);
+          setQuizState(savedQuizState);
+          setAttemptNumber(savedAttempt || 1);
+          setLoading(false);
+          return;
+        }
+      } catch (e) {
+        console.error("Failed to parse saved state", e);
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
     loadQuestions();
-  }, []);
+  }, [tutorialId, userId]);
+
+  // Save state on change
+  useEffect(() => {
+    if (!loading && questions.length > 0) {
+      const stateToSave = {
+        questions,
+        quizState,
+        attemptNumber
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+    }
+  }, [questions, quizState, attemptNumber, loading]);
 
   const loadQuestions = async () => {
     try {
@@ -53,6 +87,12 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         ...prev,
         selectedAnswers: new Array(response.data.questions.length).fill(null),
         startTime: Date.now(),
+        isCompleted: false,
+        score: 0,
+        currentQuestionIndex: 0,
+        showFeedback: false,
+        feedback: null,
+        isCorrect: null,
       }));
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load questions");
@@ -152,6 +192,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         showFeedback: false,
         feedback: null,
         isCorrect: null,
+        isCompleted: false, // Ensure not completed
       }));
     }
   };
@@ -159,9 +200,13 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   const completeQuiz = async () => {
     // Just mark as completed locally
     setQuizState((prev) => ({ ...prev, isCompleted: true }));
+    // We do NOT clear storage here, so user can see result on reload
   };
 
   const handleRetry = () => {
+    // Clear storage to force fresh start
+    localStorage.removeItem(STORAGE_KEY);
+
     setQuizState({
       currentQuestionIndex: 0,
       selectedAnswers: [],

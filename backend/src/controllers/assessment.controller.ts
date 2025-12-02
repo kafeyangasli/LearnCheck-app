@@ -73,6 +73,17 @@ export const getAssessment = async (
     const validUserId = userIdValidation.data;
     const skipCache = fresh === "true";
     const jobId = `${validUserId}-${validTutorialId}`;
+    if (!skipCache) {
+      const cachedAssessment = await getCachedAssessment(
+        validTutorialId,
+        validUserId,
+      );
+
+      if (cachedAssessment) {
+        return res.status(HTTP_STATUS.OK).json(cachedAssessment);
+      }
+    }
+
     const jobResult = await getJobResult(validTutorialId, validUserId);
 
     if (jobResult) {
@@ -86,17 +97,6 @@ export const getAssessment = async (
           message: "An unexpected error occurred during quiz generation",
           canRetry: true,
         });
-      }
-    }
-
-    if (!skipCache) {
-      const cachedAssessment = await getCachedAssessment(
-        validTutorialId,
-        validUserId,
-      );
-
-      if (cachedAssessment) {
-        return res.status(HTTP_STATUS.OK).json(cachedAssessment);
       }
     }
 
