@@ -4,6 +4,7 @@ import logger from "./config/logger";
 import { closeRedis } from "./services/redis.service";
 import { closeQueueConnection } from "./config/queue";
 import { Server } from "http";
+import { startWorker, stopWorker } from "./worker";
 
 dotenv.config();
 const PORT = process.env.PORT || 4000;
@@ -14,6 +15,8 @@ async function startServer() {
     logger.info(`Backend server running on http://localhost:${PORT}`);
     logger.info(`API endpoint: http://localhost:${PORT}/api/v1`);
   });
+
+  startWorker();
 }
 
 const gracefulShutdown = async (signal: string) => {
@@ -22,11 +25,13 @@ const gracefulShutdown = async (signal: string) => {
   if (server) {
     server.close(async () => {
       logger.info("HTTP server closed");
+      await stopWorker();
       await closeRedis();
       await closeQueueConnection();
       process.exit(0);
     });
   } else {
+    await stopWorker();
     process.exit(0);
   }
 };

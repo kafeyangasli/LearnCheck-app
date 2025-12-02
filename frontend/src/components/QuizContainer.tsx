@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 import { learnCheckApi } from "../services/api";
 import type { Question, QuizState } from "../types";
+import IntroCard from "./IntroCard";
 import QuestionCard from "./QuestionCard";
-import FeedbackCard from "./FeedbackCard";
-import ProgressCard from "./ProgressCard";
 import ResultCard from "./ResultCard";
 
 interface QuizContainerProps {
@@ -15,7 +15,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [attemptNumber, setAttemptNumber] = useState(1);
+  const [showIntro, setShowIntro] = useState(true);
 
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestionIndex: 0,
@@ -30,22 +30,19 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   // Load questions on mount
   useEffect(() => {
-    loadQuestions();
+    loadQuestions(false);
   }, []);
 
-  const loadQuestions = async () => {
+  const loadQuestions = async (newSession: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Default to attempt 1 since backend doesn't track attempts anymore
-      setAttemptNumber(1);
-
-      // Generate questions
       const response = await learnCheckApi.generateQuestions(
         tutorialId,
         userId,
-        1, // attempt_number
+        1,
+        newSession,
       );
 
       setQuestions(response.data.questions);
@@ -55,14 +52,22 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         startTime: Date.now(),
       }));
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to load questions");
+      const errorMessage =
+        err.message || err.response?.data?.message || "Gagal memuat pertanyaan";
+      setError(errorMessage);
       console.error("Error loading questions:", err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleStartQuiz = () => {
+    setShowIntro(false);
+  };
+
   const handleAnswerSelect = (answerIndex: number) => {
+    if (quizState.showFeedback) return;
+
     setQuizState((prev) => {
       const newAnswers = [...prev.selectedAnswers];
       newAnswers[prev.currentQuestionIndex] = answerIndex;
@@ -76,56 +81,55 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       quizState.selectedAnswers[quizState.currentQuestionIndex];
 
     if (selectedAnswer === null) {
-      alert("Please select an answer");
+      alert("Silakan pilih jawaban");
       return;
     }
 
-    // Local Validation Logic (New Backend)
     let isCorrect = false;
     let feedback = "";
 
-    // Feedback Prefixes (From WS 2)
     const correctPrefixes = [
       "Mantap, jawabanmu benar! ",
       "Tepat sekali! ",
       "Keren, kamu paham konsepnya! ",
       "Betul! Lanjutkan momentum belajarmu! ",
-      "Luar biasa, pemahamanmu solid! "
+      "Luar biasa, pemahamanmu solid! ",
     ];
 
     const incorrectPrefixes = [
-      "Hampir benar! Coba kita lihat lagi yuk. ",
+      "Yahh, jawabanmu masih kurang tepat! ",
       "Belum tepat, tapi jangan khawatir, ini bagian dari belajar. ",
       "Oops, masih kurang pas. Yuk kita bedah bareng! ",
       "Sedikit lagi! Coba perhatikan penjelasan berikut. ",
-      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. "
+      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. ",
     ];
 
     if (currentQuestion._rawOptions && currentQuestion.correctOptionId) {
       const selectedOptionId = currentQuestion._rawOptions[selectedAnswer].id;
       isCorrect = selectedOptionId === currentQuestion.correctOptionId;
 
-      // Smart Feedback Generation
       const prefix = isCorrect
         ? correctPrefixes[Math.floor(Math.random() * correctPrefixes.length)]
-        : incorrectPrefixes[Math.floor(Math.random() * incorrectPrefixes.length)];
+        : incorrectPrefixes[
+            Math.floor(Math.random() * incorrectPrefixes.length)
+          ];
 
-      // Parse Explanation & Hint
       const rawExplanation = currentQuestion.explanation || "";
-      const explanationParts = rawExplanation.split('Hint:');
+      const explanationParts = rawExplanation.split("Hint:");
       const mainExplanation = explanationParts[0].trim();
-      const hintText = explanationParts.length > 1 ? explanationParts[1].trim() : null;
+      const hintText =
+        explanationParts.length > 1 ? explanationParts[1].trim() : null;
 
-      // Combine for WS 1 UI
-      feedback = `${prefix}\n\n${mainExplanation}`;
+      feedback = `${prefix}${mainExplanation}`;
       if (hintText) {
-        feedback += `\n\n💡 Hint: ${hintText}`;
+        feedback += `\n\nHint: ${hintText}`;
       }
-
     } else {
-      // Fallback for legacy or missing data
-      console.warn("Missing validation data for question", currentQuestion.question_id);
-      feedback = "Feedback unavailable";
+      console.warn(
+        "Missing validation data for question",
+        currentQuestion.question_id,
+      );
+      feedback = "Feedback tidak tersedia";
     }
 
     setQuizState((prev) => ({
@@ -142,10 +146,8 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       quizState.currentQuestionIndex === questions.length - 1;
 
     if (isLastQuestion) {
-      // Complete quiz
       completeQuiz();
     } else {
-      // Move to next question
       setQuizState((prev) => ({
         ...prev,
         currentQuestionIndex: prev.currentQuestionIndex + 1,
@@ -157,7 +159,6 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   };
 
   const completeQuiz = async () => {
-    // Just mark as completed locally
     setQuizState((prev) => ({ ...prev, isCompleted: true }));
   };
 
@@ -172,37 +173,49 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       isCompleted: false,
       startTime: Date.now(),
     });
-    loadQuestions();
+    setShowIntro(true);
+    loadQuestions(true);
   };
 
-  if (loading) {
-    return (
-      <div className="quiz-container">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading questions...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Show error state
   if (error) {
     return (
-      <div className="quiz-container">
-        <div className="error-state">
-          <h3>❌ Error</h3>
-          <p>{error}</p>
-          <button onClick={loadQuestions} className="btn btn-primary">
-            Retry
+      <div className="min-h-[400px] flex flex-col items-center justify-center">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 max-w-md text-center">
+          <AlertCircle className="w-12 h-12 text-danger mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            Terjadi Kesalahan
+          </h3>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => loadQuestions(false)}
+            className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Coba Lagi
           </button>
         </div>
       </div>
     );
   }
 
+  // Show intro card first
+  if (showIntro) {
+    return (
+      <div className="py-8 px-4">
+        <IntroCard
+          totalQuestions={questions.length > 0 ? questions.length : 3}
+          isLoading={loading}
+          onStart={handleStartQuiz}
+        />
+      </div>
+    );
+  }
+
+  // Show result card when quiz is completed
   if (quizState.isCompleted) {
     return (
-      <div className="quiz-container">
+      <div className="py-8 px-4">
         <ResultCard
           score={quizState.score}
           totalQuestions={questions.length}
@@ -217,32 +230,20 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     quizState.selectedAnswers[quizState.currentQuestionIndex];
 
   return (
-    <div className="quiz-container">
-      <ProgressCard
-        currentQuestion={quizState.currentQuestionIndex + 1}
+    <div className="py-8 px-4">
+      <QuestionCard
+        question={currentQuestion}
+        questionNumber={quizState.currentQuestionIndex + 1}
         totalQuestions={questions.length}
-        score={quizState.score}
-        attemptNumber={attemptNumber}
+        selectedAnswer={selectedAnswer}
+        onAnswerSelect={handleAnswerSelect}
+        onSubmit={handleSubmitAnswer}
+        onNext={handleNextQuestion}
+        showFeedback={quizState.showFeedback}
+        isCorrect={quizState.isCorrect}
+        feedback={quizState.feedback}
+        isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
       />
-
-      {!quizState.showFeedback ? (
-        <QuestionCard
-          question={currentQuestion}
-          questionNumber={quizState.currentQuestionIndex + 1}
-          selectedAnswer={selectedAnswer}
-          onAnswerSelect={handleAnswerSelect}
-          onSubmit={handleSubmitAnswer}
-        />
-      ) : (
-        <FeedbackCard
-          feedback={quizState.feedback!}
-          isCorrect={quizState.isCorrect!}
-          onNext={handleNextQuestion}
-          isLastQuestion={
-            quizState.currentQuestionIndex === questions.length - 1
-          }
-        />
-      )}
     </div>
   );
 };

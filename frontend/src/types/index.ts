@@ -40,3 +40,11 @@ export interface IframeParams {
   tutorial_id: string;
   user_id: string;
 }
+
+// User Preferences
+export interface UserPreferences {
+  layoutWidth: "fullWidth" | "centered" | "compact";
+  fontStyle: "default" | "serif" | "monospace";
+  theme: "light" | "dark" | "auto";
+  fontSize: "small" | "medium" | "large";
+}

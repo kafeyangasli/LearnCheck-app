@@ -149,46 +149,73 @@ const processAssessmentJob = async (
   }
 };
 
-const worker = new Worker<AssessmentJobData>(
-  "assessment-generation",
-  processAssessmentJob,
-  {
-    connection: createWorkerConnection(),
-    concurrency: 5,
-    limiter: {
-      max: 10,
-      duration: 60000,
-    },
-  },
-);
+let worker: Worker<AssessmentJobData> | null = null;
 
-worker.on("completed", (job: Job<AssessmentJobData>) => {
-  logger.info(`[Worker] Job ${job.id} completed`);
-});
-worker.on("failed", (job: Job<AssessmentJobData> | undefined, err: Error) => {
-  logger.error(`[Worker] Job ${job?.id} failed:`, err.message);
-});
-worker.on("active", (job: Job<AssessmentJobData>) => {
-  logger.info(`[Worker] Job ${job.id} is now active`);
-});
-worker.on("progress", (job: Job<AssessmentJobData>, progress: JobProgress) => {
-  logger.debug(`[Worker] Job ${job.id} progress: ${progress}%`);
-});
-worker.on("error", (err: Error) => {
-  logger.error("[Worker] Worker error:", err);
-});
-const gracefulShutdown = async (signal: string) => {
-  logger.info(`[Worker] ${signal} received, shutting down gracefully...`);
+export const startWorker = () => {
+  if (worker) {
+    logger.warn("[Worker] Worker already running");
+    return;
+  }
+
+  worker = new Worker<AssessmentJobData>(
+    "assessment-generation",
+    processAssessmentJob,
+    {
+      connection: createWorkerConnection(),
+      concurrency: 5,
+      limiter: {
+        max: 10,
+        duration: 60000,
+      },
+    },
+  );
+
+  worker.on("completed", (job: Job<AssessmentJobData>) => {
+    logger.info(`[Worker] Job ${job.id} completed`);
+  });
+  worker.on("failed", (job: Job<AssessmentJobData> | undefined, err: Error) => {
+    logger.error(`[Worker] Job ${job?.id} failed:`, err.message);
+  });
+  worker.on("active", (job: Job<AssessmentJobData>) => {
+    logger.info(`[Worker] Job ${job.id} is now active`);
+  });
+  worker.on(
+    "progress",
+    (job: Job<AssessmentJobData>, progress: JobProgress) => {
+      logger.debug(`[Worker] Job ${job.id} progress: ${progress}%`);
+    },
+  );
+  worker.on("error", (err: Error) => {
+    logger.error("[Worker] Worker error:", err);
+  });
+
+  logger.info("[Worker] Assessment worker started with concurrency: 5");
+};
+
+export const stopWorker = async () => {
+  if (!worker) {
+    return;
+  }
+
+  logger.info("[Worker] Shutting down worker...");
   await worker.close();
 
   if (resultStoreConnection) {
     await resultStoreConnection.quit();
   }
 
-  logger.info("[Worker] Shutdown complete");
+  worker = null;
+  logger.info("[Worker] Worker shutdown complete");
+};
+
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`[Worker] ${signal} received, shutting down gracefully...`);
+  await stopWorker();
   process.exit(0);
 };
 
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-logger.info("[Worker] Assessment worker started with concurrency: 5");
+if (require.main === module) {
+  process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+  process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+  startWorker();
+}

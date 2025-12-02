@@ -16,12 +16,15 @@ const CACHE_CONFIG = {
   PREFERENCES_TTL: 5 * 60,
   RATE_LIMIT_WINDOW: 60,
   MAX_REQUESTS_PER_MINUTE: 10,
+  SESSION_TTL: 60 * 60,
 } as const;
 
 const getCacheKey = {
   quizPool: (tutorialId: string) => `learncheck:quiz:pool:${tutorialId}`,
   preferences: (userId: string) => `learncheck:prefs:user:${userId}`,
   rateLimit: (userId: string) => `learncheck:ratelimit:${userId}`,
+  activeSession: (tutorialId: string, userId: string) =>
+    `learncheck:session:${tutorialId}:${userId}`,
 };
 
 export const getJobResult = async (
@@ -48,6 +51,56 @@ export const getJobResult = async (
   }
 };
 
+export const getActiveSession = async (
+  tutorialId: string,
+  userId: string,
+): Promise<AssessmentResponse | null> => {
+  const sessionKey = getCacheKey.activeSession(tutorialId, userId);
+  const cachedSession = await getCache(sessionKey);
+
+  if (!cachedSession) {
+    return null;
+  }
+
+  try {
+    const session = JSON.parse(cachedSession) as AssessmentResponse;
+    logger.info(
+      `[Assessment] Found active session for user ${userId}, tutorial ${tutorialId}`,
+    );
+    return session;
+  } catch (error) {
+    logger.error("[Assessment] Failed to parse active session:", error);
+    return null;
+  }
+};
+
+export const clearActiveSession = async (
+  tutorialId: string,
+  userId: string,
+): Promise<void> => {
+  const sessionKey = getCacheKey.activeSession(tutorialId, userId);
+  await setCache(sessionKey, "", 1);
+  logger.info(
+    `[Assessment] Cleared active session for user ${userId}, tutorial ${tutorialId}`,
+  );
+};
+
+const saveActiveSession = async (
+  tutorialId: string,
+  userId: string,
+  assessment: AssessmentResponse,
+): Promise<void> => {
+  const sessionKey = getCacheKey.activeSession(tutorialId, userId);
+  await setCache(
+    sessionKey,
+    JSON.stringify(assessment),
+    CACHE_CONFIG.SESSION_TTL,
+  );
+  logger.info(
+    `[Assessment] Saved active session for user ${userId}, tutorial ${tutorialId}`,
+  );
+};
+
 export const getCachedAssessment = async (
   tutorialId: string,
   userId: string,
@@ -68,11 +121,16 @@ export const getCachedAssessment = async (
     const randomAssessment = selectRandomQuestions(fullAssessment);
     const userPreferences = await getUserPreferences(userId);
 
-    return {
+    const assessmentResponse: AssessmentResponse = {
       assessment: randomAssessment,
       userPreferences,
       fromCache: true,
     };
+
+    // Save as active session so reload returns same questions
+    await saveActiveSession(tutorialId, userId, assessmentResponse);
+
+    return assessmentResponse;
   } catch (error) {
     logger.error("[Assessment] Failed to parse cached pool:", error);
 

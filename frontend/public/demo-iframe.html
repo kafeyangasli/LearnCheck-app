@@ -1,325 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LearnCheck - iFrame Demo</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnCheck - iFrame Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 2rem;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    .header {
-      text-align: center;
-      color: white;
-      margin-bottom: 2rem;
-    }
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-    .header h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-    }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
 
-    .header p {
-      font-size: 1.125rem;
-      opacity: 0.9;
-    }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
 
-    .demo-section {
-      background: white;
-      border-radius: 12px;
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
+        .controls {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-    .demo-section h2 {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-      color: #1e293b;
-    }
+        .form-group {
+            margin-bottom: 15px;
+        }
 
-    .iframe-container {
-      background: #f8fafc;
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 500;
+        }
 
-    iframe {
-      width: 100%;
-      height: 700px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      background: white;
-    }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
 
-    .code-block {
-      background: #1e293b;
-      color: #e2e8f0;
-      padding: 1.5rem;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin-bottom: 1rem;
-    }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
 
-    .code-block code {
-      font-family: 'Courier New', monospace;
-      font-size: 0.875rem;
-      line-height: 1.6;
-    }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-    .params-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
+        button:hover {
+            background: #5568d3;
+        }
 
-    .params-table th,
-    .params-table td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid #e2e8f0;
-    }
+        .iframe-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 700px;
+        }
 
-    .params-table th {
-      background: #f8fafc;
-      font-weight: 600;
-      color: #1e293b;
-    }
+        iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+            border-radius: 8px;
+        }
 
-    .params-table code {
-      background: #f1f5f9;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      font-size: 0.875rem;
-    }
+        .code-block {
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
 
-    .note {
-      background: #eff6ff;
-      border-left: 4px solid #3b82f6;
-      padding: 1rem;
-      border-radius: 4px;
-      margin-bottom: 1rem;
-    }
+        .code-block pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #333;
+        }
 
-    .note strong {
-      color: #1e40af;
-    }
+        .info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
 
-    .examples {
-      display: grid;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .example-card {
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      padding: 1rem;
-    }
-
-    .example-card h4 {
-      color: #1e293b;
-      margin-bottom: 0.5rem;
-    }
-
-    .example-card code {
-      display: block;
-      background: #1e293b;
-      color: #e2e8f0;
-      padding: 1rem;
-      border-radius: 4px;
-      overflow-x: auto;
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 1rem;
-      }
-
-      .header h1 {
-        font-size: 1.75rem;
-      }
-
-      iframe {
-        height: 600px;
-      }
-    }
-  </style>
+        .info strong {
+            color: #1976d2;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>🎓 LearnCheck iFrame Demo</h1>
-      <p>AI-Powered Formative Assessment System</p>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 LearnCheck - iFrame Embed Demo</h1>
+            <p class="subtitle">AI-Powered Formative Assessment System</p>
+        </div>
+
+        <div class="controls">
+            <div class="info">
+                <strong>ℹ️ Info:</strong> Enter the Tutorial ID and User ID below, then click "Load Quiz" to embed the LearnCheck quiz.
+            </div>
+
+            <div class="form-group">
+                <label for="tutorialId">Tutorial ID:</label>
+                <input type="text" id="tutorialId" placeholder="e.g., 35363" value="35363">
+            </div>
+
+            <div class="form-group">
+                <label for="userId">User ID:</label>
+                <input type="text" id="userId" placeholder="e.g., user123" value="1">
+            </div>
+
+            <button onclick="loadQuiz()">🚀 Load Quiz</button>
+
+            <div class="code-block" id="embedCode" style="display: none;">
+                <strong></strong>Embed Code:</strong>
+                <pre id="codeDisplay"></pre>
+            </div>
+        </div>
+
+        <div class="iframe-container">
+            <div id="iframeWrapper"></div>
+        </div>
     </div>
 
-    <!-- Live Demo -->
-    <div class="demo-section">
-      <h2>📺 Live Demo</h2>
-      <div class="iframe-container">
-        <iframe
-          src="http://localhost:5173/?tutorial_id=35363&user_id=demo_user_123"
-          title="LearnCheck Quiz"
-          allow="fullscreen"
-        ></iframe>
-      </div>
-      <div class="note">
-        <strong>💡 Note:</strong> This demo uses tutorial_id=35363 (AI Tutorial dari Mock Dicoding API) dan user_id=demo_user_123
-      </div>
-    </div>
+    <script>
+        // Configuration
+        const BASE_URL = window.location.origin;
 
-    <!-- Integration Guide -->
-    <div class="demo-section">
-      <h2>📝 Integration Guide</h2>
+        function sanitizeInput(value) {
+            // Remove any special characters that could break the URL
+            return value.trim().replace(/[^a-zA-Z0-9_\-\.]/g, '');
+        }
 
-      <h3 style="margin-bottom: 1rem; color: #475569;">Required Parameters</h3>
-      <table class="params-table">
-        <thead>
-          <tr>
-            <th>Parameter</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Example</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code>tutorial_id</code></td>
-            <td>String</td>
-            <td>Tutorial/Module ID dari LMS</td>
-            <td><code>35363</code></td>
-          </tr>
-          <tr>
-            <td><code>user_id</code></td>
-            <td>String</td>
-            <td>Unique User ID dari LMS</td>
-            <td><code>user123</code></td>
-          </tr>
-        </tbody>
-      </table>
+        function loadQuiz() {
+            const tutorialIdInput = document.getElementById('tutorialId');
+            const userIdInput = document.getElementById('userId');
 
-      <h3 style="margin: 1.5rem 0 1rem; color: #475569;">Embed Code Examples</h3>
+            const tutorialId = sanitizeInput(tutorialIdInput.value);
+            const userId = sanitizeInput(userIdInput.value);
 
-      <div class="examples">
-        <div class="example-card">
-          <h4>Basic iFrame Embed</h4>
-          <code>&lt;iframe
-  src="https://learncheck.example.com/?tutorial_id={tutorial_id}&amp;user_id={user_id}"
+            if (!tutorialId || !userId) {
+                alert('Please enter both Tutorial ID and User ID');
+                return;
+            }
+
+            // Construct the iframe URL
+            const iframeUrl = `${BASE_URL}/?tutorial_id=${tutorialId}&user_id=${userId}`;
+
+            // Create iframe element
+            const iframe = document.createElement('iframe');
+            iframe.src = iframeUrl;
+            iframe.width = '100%';
+            iframe.height = '700';
+            iframe.frameBorder = '0';
+            iframe.style.borderRadius = '8px';
+            iframe.setAttribute('allow', 'fullscreen');
+
+            // Replace existing iframe
+            const wrapper = document.getElementById('iframeWrapper');
+            wrapper.innerHTML = '';
+            wrapper.appendChild(iframe);
+
+            // Show embed code
+            const embedCode = `<iframe
+  src="${iframeUrl}"
   width="100%"
   height="700"
   frameborder="0"
-&gt;&lt;/iframe&gt;</code>
-        </div>
+  style="border-radius: 8px;"
+  allow="fullscreen">
+</iframe>`;
 
-        <div class="example-card">
-          <h4>With Responsive Container</h4>
-          <code>&lt;div style="position: relative; padding-bottom: 75%; height: 0;"&gt;
-  &lt;iframe
-    src="https://learncheck.example.com/?tutorial_id={tutorial_id}&amp;user_id={user_id}"
-    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
-    frameborder="0"
-  &gt;&lt;/iframe&gt;
-&lt;/div&gt;</code>
-        </div>
+            document.getElementById('codeDisplay').textContent = embedCode;
+            document.getElementById('embedCode').style.display = 'block';
 
-        <div class="example-card">
-          <h4>Dynamic Embed dengan JavaScript</h4>
-          <code>const tutorialId = '35363';
-const userId = getCurrentUserId(); // Get from your LMS
+            console.log('Loading quiz with params:', { tutorialId, userId });
+            console.log('iFrame URL:', iframeUrl);
+        }
 
-const iframe = document.createElement('iframe');
-iframe.src = `https://learncheck.example.com/?tutorial_id=${tutorialId}&user_id=${userId}`;
-iframe.width = '100%';
-iframe.height = '700';
-iframe.frameBorder = '0';
+        // Auto-load on page load with default values
+        window.addEventListener('DOMContentLoaded', function() {
+            loadQuiz();
+        });
 
-document.getElementById('quiz-container').appendChild(iframe);</code>
-        </div>
-
-        <div class="example-card">
-          <h4>Template untuk Dicoding Classroom</h4>
-          <code>&lt;iframe
-  src="https://learncheck.example.com/?tutorial_id={{tutorial_id}}&amp;user_id={{user_id}}"
-  width="100%"
-  height="700"
-  allow="fullscreen"
-&gt;&lt;/iframe&gt;</code>
-        </div>
-      </div>
-    </div>
-
-    <!-- Features -->
-    <div class="demo-section">
-      <h2>✨ Features</h2>
-      <ul style="list-style: none; padding: 0;">
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
-          ✅ <strong>Auto Question Generation</strong> - Generate soal dari konten tutorial menggunakan AI
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
-          ✅ <strong>Adaptive Difficulty</strong> - Kesulitan menyesuaikan dengan performa user
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
-          ✅ <strong>Intelligent Feedback</strong> - Feedback AI yang dipersonalisasi
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
-          ✅ <strong>Progress Tracking</strong> - Track riwayat dan skor user
-        </li>
-        <li style="padding: 0.5rem 0; border-bottom: 1px solid #e2e8f0;">
-          ✅ <strong>Responsive Design</strong> - Bekerja di semua device
-        </li>
-        <li style="padding: 0.5rem 0;">
-          ✅ <strong>iFrame Ready</strong> - Mudah di-embed di LMS manapun
-        </li>
-      </ul>
-    </div>
-
-    <!-- Technical Details -->
-    <div class="demo-section">
-      <h2>⚙️ Technical Details</h2>
-      <table class="params-table">
-        <tbody>
-          <tr>
-            <td><strong>Frontend</strong></td>
-            <td>React 19 + TypeScript + Vite</td>
-          </tr>
-          <tr>
-            <td><strong>Backend</strong></td>
-            <td>Node.js + Express + TypeScript</td>
-          </tr>
-          <tr>
-            <td><strong>LLM Service</strong></td>
-            <td>Google Gemini 2.0 Flash</td>
-          </tr>
-          <tr>
-            <td><strong>Cache</strong></td>
-            <td>Redis 7</td>
-          </tr>
-          <tr>
-            <td><strong>Deployment</strong></td>
-            <td>aaPanel / Docker</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
+        // Listen for messages from iframe (optional)
+        window.addEventListener('message', function(event) {
+            console.log('Message from iframe:', event.data);
+        });
+    </script>
 </body>
 </html>
