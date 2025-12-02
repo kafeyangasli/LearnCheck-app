@@ -274,9 +274,15 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         <QuestionCard
           question={currentQuestion}
           questionNumber={quizState.currentQuestionIndex + 1}
+          totalQuestions={questions.length}
           selectedAnswer={selectedAnswer}
           onAnswerSelect={handleAnswerSelect}
           onSubmit={handleSubmitAnswer}
+          onNext={handleNextQuestion}
+          showFeedback={quizState.showFeedback}
+          isCorrect={quizState.isCorrect}
+          feedback={quizState.feedback}
+          isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
         />
       ) : (
         <FeedbackCard

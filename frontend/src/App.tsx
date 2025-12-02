@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import QuizContainer from './components/QuizContainer';
 import { getIframeParams, isInIframe } from './utils/iframeParams';
 import type { IframeParams } from './types';
-import './App.css';
+
 
 const queryClient = new QueryClient();
 
