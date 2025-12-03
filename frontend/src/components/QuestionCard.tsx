@@ -14,7 +14,7 @@ interface QuestionCardProps {
   isCorrect: boolean | null;
   feedback: string | null;
   isLastQuestion: boolean;
-  isDark?: boolean;
+  questionStartTime: number;
 }
 
 const QuestionCard = ({
@@ -29,31 +29,33 @@ const QuestionCard = ({
   isCorrect,
   feedback,
   isLastQuestion,
-  isDark = false,
+  questionStartTime,
 }: QuestionCardProps) => {
-  const [timeRemaining, setTimeRemaining] = useState(180);
+  const QUESTION_TIME_LIMIT = 180; // 3 minutes in seconds
+
+  // Calculate initial time remaining based on elapsed time
+  const calculateTimeRemaining = () => {
+    const elapsed = Math.floor((Date.now() - questionStartTime) / 1000);
+    return Math.max(0, QUESTION_TIME_LIMIT - elapsed);
+  };
+
+  const [timeRemaining, setTimeRemaining] = useState(calculateTimeRemaining());
 
   // Timer effect
   useEffect(() => {
     if (showFeedback) return;
 
     const timer = setInterval(() => {
-      setTimeRemaining((prev) => {
-        if (prev <= 0) {
-          clearInterval(timer);
-          return 0;
-        }
-        return prev - 1;
-      });
+      setTimeRemaining(calculateTimeRemaining());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [showFeedback]);
+  }, [showFeedback, questionStartTime]);
 
-  // Reset timer when question changes
+  // Update timer when question changes
   useEffect(() => {
-    setTimeRemaining(180);
-  }, [questionNumber]);
+    setTimeRemaining(calculateTimeRemaining());
+  }, [questionNumber, questionStartTime]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -77,12 +79,12 @@ const QuestionCard = ({
   const parseFeedback = (feedbackText: string | null) => {
     if (!feedbackText) return { mainText: "", hint: null };
 
-    const hintMatch = feedbackText.match(/Hint: (.+)$/s);
+    const hintMatch = feedbackText.match(/💡 Hint: (.+)$/s);
     let mainText = feedbackText;
     let hint: string | null = null;
 
     if (hintMatch) {
-      mainText = feedbackText.replace(/\n\nHint: .+$/s, "");
+      mainText = feedbackText.replace(/\n\n💡 Hint: .+$/s, "");
       hint = hintMatch[1];
     }
 
@@ -94,9 +96,9 @@ const QuestionCard = ({
   // Get option status for styling
   const getOptionStatus = (
     index: number,
-  ): "correct" | "incorrect" | "default" | "neutral" => {
+  ): "correct" | "incorrect" | "selected" | "neutral" => {
     if (!showFeedback) {
-      return selectedAnswer === index ? "default" : "neutral";
+      return selectedAnswer === index ? "selected" : "neutral";
     }
 
     if (index === correctAnswerIndex) {
@@ -111,43 +113,22 @@ const QuestionCard = ({
   };
 
   return (
-    <div
-      className={`
-        rounded-2xl shadow-lg border overflow-hidden
-        ${isDark ? "bg-dark-card border-dark-border" : "bg-white border-gray-200"}
-      `}
-    >
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       {/* Header with question number and timer */}
-      <div className="px-6 py-4 flex items-center justify-between">
-        <span
-          className={`text-sm font-medium ${isDark ? "text-dark-text-muted" : "text-gray-500"}`}
-        >
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
           Pertanyaan {questionNumber} dari {totalQuestions}
         </span>
-        <div className="flex items-center gap-1.5 border border-primary text-primary px-3 py-1.5 rounded-md text-sm font-medium">
+        <div className="flex items-center gap-2 border border-cyan-400 text-cyan-600 px-3 py-1.5 rounded-md text-sm font-medium bg-cyan-50">
           <Clock className="w-4 h-4" />
           <span>{formatTime(timeRemaining)}</span>
-        </div>
-      </div>
-
-      {/* Progress bar */}
-      <div className="px-6">
-        <div
-          className={`h-2 rounded-full overflow-hidden ${isDark ? "bg-dark-secondary" : "bg-gray-200"}`}
-        >
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${(questionNumber / totalQuestions) * 100}%` }}
-          />
         </div>
       </div>
 
       <div className="p-6">
         {/* Question text */}
         <div className="mb-6">
-          <p
-            className={`font-bold text-lg leading-relaxed ${isDark ? "text-dark-text" : "text-gray-900"}`}
-          >
+          <p className="font-semibold text-base leading-relaxed text-gray-900 dark:text-white">
             {question.question}
           </p>
         </div>
@@ -159,38 +140,23 @@ const QuestionCard = ({
             const optionText =
               typeof option === "object" ? option.text : option;
 
-            // Determine styles based on status and theme
+            // Determine styles based on status
             let containerStyles = "";
             let radioStyles = "";
-            let textStyles = "";
+            let textStyles = "text-gray-800";
 
             if (status === "correct") {
               containerStyles = "border-emerald-400 bg-emerald-50";
-              if (isDark)
-                containerStyles = "border-emerald-400 bg-emerald-900/20";
-              textStyles = isDark ? "text-emerald-300" : "text-gray-800";
-              radioStyles = isDark
-                ? "border-gray-400 bg-transparent"
-                : "border-gray-400 bg-white";
+              radioStyles = "border-emerald-500 bg-emerald-500";
             } else if (status === "incorrect") {
               containerStyles = "border-red-400 bg-red-50";
-              if (isDark) containerStyles = "border-red-400 bg-red-900/20";
-              textStyles = isDark ? "text-red-300" : "text-gray-800";
-              radioStyles = "border-gray-800 bg-gray-800";
-            } else if (status === "default") {
-              containerStyles = isDark
-                ? "border-dark-border bg-dark-secondary"
-                : "border-gray-300 bg-gray-50";
-              textStyles = isDark ? "text-dark-text" : "text-gray-700";
-              radioStyles = "border-gray-800 bg-gray-800";
+              radioStyles = "border-red-500 bg-red-500";
+            } else if (status === "selected") {
+              containerStyles = "border-emerald-400 bg-emerald-50";
+              radioStyles = "border-emerald-500 bg-emerald-500";
             } else {
-              containerStyles = isDark
-                ? "border-dark-border bg-transparent"
-                : "border-gray-200 bg-white";
-              textStyles = isDark ? "text-dark-text-muted" : "text-gray-700";
-              radioStyles = isDark
-                ? "border-dark-border bg-transparent"
-                : "border-gray-300 bg-white";
+              containerStyles = "border-gray-200 bg-white hover:border-gray-300";
+              radioStyles = "border-gray-300 bg-white";
             }
 
             return (
@@ -198,39 +164,34 @@ const QuestionCard = ({
                 key={index}
                 onClick={() => !showFeedback && onAnswerSelect(index)}
                 className={`
-                  flex items-center justify-between p-4 rounded-xl border-2 transition-all
+                  flex items-center justify-between p-4 rounded-lg border-2 transition-all
                   ${containerStyles}
-                  ${!showFeedback ? "cursor-pointer hover:border-gray-300" : "cursor-default"}
+                  ${!showFeedback ? "cursor-pointer" : "cursor-default"}
                 `}
               >
-                {/* Left side: Radio + Option text */}
-                <div className="flex items-center gap-4">
-                  {/* Radio button */}
+                <div className="flex items-center gap-3">
                   <div
                     className={`
                       w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
                       ${radioStyles}
                     `}
                   >
-                    {(status === "default" || status === "incorrect") && (
-                      <div className="w-2 h-2 rounded-full bg-white" />
+                    {(status === "selected" || status === "correct" || status === "incorrect") && (
+                      <div className="w-2.5 h-2.5 rounded-full bg-white" />
                     )}
                   </div>
-
-                  {/* Option text */}
-                  <span className={`text-sm font-medium ${textStyles}`}>
+                  <span className={`text-sm font-normal ${textStyles}`}>
                     {optionText}
                   </span>
                 </div>
 
-                {/* Right side: Status icon */}
                 {showFeedback && status === "correct" && (
-                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
                     <Check className="w-5 h-5 text-white" strokeWidth={3} />
                   </div>
                 )}
                 {showFeedback && status === "incorrect" && (
-                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
                     <X className="w-5 h-5 text-white" strokeWidth={3} />
                   </div>
                 )}
@@ -241,43 +202,28 @@ const QuestionCard = ({
 
         {/* Feedback Section - shown after submit */}
         {showFeedback && (
-          <div
-            className={`mt-6 pt-6 border-t ${isDark ? "border-dark-border" : "border-gray-200"}`}
-          >
-            <h3
-              className={`text-xl font-bold mb-3 ${isDark ? "text-dark-text" : "text-gray-900"}`}
-            >
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-bold mb-3 text-gray-900 dark:text-white">
               Penjelasan
             </h3>
-            <p
-              className={`text-sm leading-relaxed whitespace-pre-wrap ${isDark ? "text-dark-text-muted" : "text-gray-700"}`}
-            >
+            <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-700 dark:text-gray-300 mb-4">
               {mainText}
             </p>
 
             {/* Hint box */}
             {hint && (
-              <div
-                className={`
-                  mt-4 p-4 rounded-lg border
-                  ${isDark ? "bg-cyan-900/20 border-cyan-700" : "bg-cyan-50 border-cyan-200"}
-                `}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Lightbulb
-                    className={`w-4 h-4 ${isDark ? "text-cyan-400" : "text-cyan-600"}`}
-                  />
-                  <span
-                    className={`font-semibold text-sm ${isDark ? "text-cyan-400" : "text-cyan-600"}`}
-                  >
-                    Hint
-                  </span>
+              <div className="p-4 rounded-lg bg-cyan-50 border border-cyan-200">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-cyan-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-sm text-cyan-700 block mb-1">
+                      Hint
+                    </span>
+                    <p className="text-sm leading-relaxed text-gray-700">
+                      {hint}
+                    </p>
+                  </div>
                 </div>
-                <p
-                  className={`text-sm leading-relaxed ${isDark ? "text-dark-text-muted" : "text-gray-700"}`}
-                >
-                  {hint}
-                </p>
               </div>
             )}
           </div>
@@ -291,12 +237,9 @@ const QuestionCard = ({
               disabled={selectedAnswer === null}
               className={`
                 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all
-                ${
-                  selectedAnswer !== null
-                    ? "bg-primary hover:bg-primary-dark text-white shadow-md hover:shadow-lg"
-                    : isDark
-                      ? "bg-dark-secondary text-dark-text-muted cursor-not-allowed"
-                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                ${selectedAnswer !== null
+                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }
               `}
             >
@@ -305,7 +248,7 @@ const QuestionCard = ({
           ) : (
             <button
               onClick={onNext}
-              className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all shadow-md hover:shadow-lg"
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-sm transition-all shadow-sm hover:shadow-md"
             >
               {isLastQuestion ? "Akhiri Kuis" : "Soal Berikutnya"}
             </button>
@@ -317,3 +260,4 @@ const QuestionCard = ({
 };
 
 export default QuestionCard;
+

@@ -33,6 +33,7 @@ export interface QuizState {
   score: number;
   isCompleted: boolean;
   startTime: number;
+  questionStartTimes: number[]; // Track when each question was started
 }
 
 // Iframe Params

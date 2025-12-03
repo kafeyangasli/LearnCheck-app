@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { learnCheckApi } from "../services/api";
 import type { Question, QuizState } from "../types";
 import QuestionCard from "./QuestionCard";
-import FeedbackCard from "./FeedbackCard";
 import ProgressCard from "./ProgressCard";
 import ResultCard from "./ResultCard";
+import IntroCard from "./IntroCard";
 
 interface QuizContainerProps {
   tutorialId: string;
@@ -13,9 +13,10 @@ interface QuizContainerProps {
 
 const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [attemptNumber, setAttemptNumber] = useState(1);
+  const [quizStarted, setQuizStarted] = useState(false);
 
   const [quizState, setQuizState] = useState<QuizState>({
     currentQuestionIndex: 0,
@@ -26,12 +27,13 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     score: 0,
     isCompleted: false,
     startTime: Date.now(),
+    questionStartTimes: [],
   });
 
   // Storage key for persistence
   const STORAGE_KEY = `quiz_state_${tutorialId}_${userId}`;
 
-  // Load questions and state on mount
+  // Load saved state on mount
   useEffect(() => {
     const savedState = localStorage.getItem(STORAGE_KEY);
 
@@ -43,7 +45,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
           setQuestions(savedQuestions);
           setQuizState(savedQuizState);
           setAttemptNumber(savedAttempt || 1);
-          setLoading(false);
+          setQuizStarted(true);
           return;
         }
       } catch (e) {
@@ -51,8 +53,6 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         localStorage.removeItem(STORAGE_KEY);
       }
     }
-
-    loadQuestions();
   }, [tutorialId, userId]);
 
   // Save state on change
@@ -83,17 +83,20 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       );
 
       setQuestions(response.data.questions);
+      const now = Date.now();
       setQuizState((prev) => ({
         ...prev,
         selectedAnswers: new Array(response.data.questions.length).fill(null),
-        startTime: Date.now(),
+        startTime: now,
         isCompleted: false,
         score: 0,
         currentQuestionIndex: 0,
         showFeedback: false,
         feedback: null,
         isCorrect: null,
+        questionStartTimes: new Array(response.data.questions.length).fill(0).map((_, i) => i === 0 ? now : 0),
       }));
+      setQuizStarted(true);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to load questions");
       console.error("Error loading questions:", err);
@@ -185,15 +188,26 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       // Complete quiz
       completeQuiz();
     } else {
-      // Move to next question
-      setQuizState((prev) => ({
-        ...prev,
-        currentQuestionIndex: prev.currentQuestionIndex + 1,
-        showFeedback: false,
-        feedback: null,
-        isCorrect: null,
-        isCompleted: false, // Ensure not completed
-      }));
+      // Move to next question and record start time
+      const nextIndex = quizState.currentQuestionIndex + 1;
+      const now = Date.now();
+
+      setQuizState((prev) => {
+        const newStartTimes = [...prev.questionStartTimes];
+        if (newStartTimes[nextIndex] === 0) {
+          newStartTimes[nextIndex] = now;
+        }
+
+        return {
+          ...prev,
+          currentQuestionIndex: nextIndex,
+          showFeedback: false,
+          feedback: null,
+          isCorrect: null,
+          isCompleted: false,
+          questionStartTimes: newStartTimes,
+        };
+      });
     }
   };
 
@@ -207,6 +221,8 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     // Clear storage to force fresh start
     localStorage.removeItem(STORAGE_KEY);
 
+    setQuizStarted(false);
+    setQuestions([]);
     setQuizState({
       currentQuestionIndex: 0,
       selectedAnswers: [],
@@ -216,16 +232,29 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       score: 0,
       isCompleted: false,
       startTime: Date.now(),
+      questionStartTimes: [],
     });
-    loadQuestions();
   };
+
+  // Show intro card if quiz hasn't started
+  if (!quizStarted) {
+    return (
+      <div className="max-w-3xl mx-auto p-6">
+        <IntroCard
+          totalQuestions={3}
+          isLoading={loading}
+          onStart={loadQuestions}
+        />
+      </div>
+    );
+  }
 
   if (loading) {
     return (
-      <div className="quiz-container">
-        <div className="loading-state">
-          <div className="spinner"></div>
-          <p>Loading questions...</p>
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-gray-600">Memuat pertanyaan...</p>
         </div>
       </div>
     );
@@ -233,12 +262,12 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   if (error) {
     return (
-      <div className="quiz-container">
-        <div className="error-state">
-          <h3>❌ Error</h3>
-          <p>{error}</p>
-          <button onClick={loadQuestions} className="btn btn-primary">
-            Retry
+      <div className="max-w-3xl mx-auto p-6">
+        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+          <h3 className="text-xl font-bold text-red-600">❌ Error</h3>
+          <p className="text-gray-700">{error}</p>
+          <button onClick={loadQuestions} className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all shadow-md hover:shadow-lg">
+            Coba Lagi
           </button>
         </div>
       </div>
@@ -247,7 +276,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   if (quizState.isCompleted) {
     return (
-      <div className="quiz-container">
+      <div className="max-w-3xl mx-auto p-6">
         <ResultCard
           score={quizState.score}
           totalQuestions={questions.length}
@@ -262,7 +291,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     quizState.selectedAnswers[quizState.currentQuestionIndex];
 
   return (
-    <div className="quiz-container">
+    <div className="max-w-3xl mx-auto p-6">
       <ProgressCard
         currentQuestion={quizState.currentQuestionIndex + 1}
         totalQuestions={questions.length}
@@ -270,30 +299,20 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         attemptNumber={attemptNumber}
       />
 
-      {!quizState.showFeedback ? (
-        <QuestionCard
-          question={currentQuestion}
-          questionNumber={quizState.currentQuestionIndex + 1}
-          totalQuestions={questions.length}
-          selectedAnswer={selectedAnswer}
-          onAnswerSelect={handleAnswerSelect}
-          onSubmit={handleSubmitAnswer}
-          onNext={handleNextQuestion}
-          showFeedback={quizState.showFeedback}
-          isCorrect={quizState.isCorrect}
-          feedback={quizState.feedback}
-          isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
-        />
-      ) : (
-        <FeedbackCard
-          feedback={quizState.feedback!}
-          isCorrect={quizState.isCorrect!}
-          onNext={handleNextQuestion}
-          isLastQuestion={
-            quizState.currentQuestionIndex === questions.length - 1
-          }
-        />
-      )}
+      <QuestionCard
+        question={currentQuestion}
+        questionNumber={quizState.currentQuestionIndex + 1}
+        totalQuestions={questions.length}
+        selectedAnswer={selectedAnswer}
+        onAnswerSelect={handleAnswerSelect}
+        onSubmit={handleSubmitAnswer}
+        onNext={handleNextQuestion}
+        showFeedback={quizState.showFeedback}
+        isCorrect={quizState.isCorrect}
+        feedback={quizState.feedback}
+        isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
+        questionStartTime={quizState.questionStartTimes[quizState.currentQuestionIndex] || Date.now()}
+      />
     </div>
   );
 };
