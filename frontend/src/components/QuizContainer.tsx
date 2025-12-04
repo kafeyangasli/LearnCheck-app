@@ -39,7 +39,11 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
     if (savedState) {
       try {
-        const { questions: savedQuestions, quizState: savedQuizState, attemptNumber: savedAttempt } = JSON.parse(savedState);
+        const {
+          questions: savedQuestions,
+          quizState: savedQuizState,
+          attemptNumber: savedAttempt,
+        } = JSON.parse(savedState);
 
         if (savedQuestions && savedQuestions.length > 0) {
           setQuestions(savedQuestions);
@@ -61,7 +65,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       const stateToSave = {
         questions,
         quizState,
-        attemptNumber
+        attemptNumber,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
     }
@@ -79,7 +83,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       const response = await learnCheckApi.generateQuestions(
         tutorialId,
         userId,
-        1, // attempt_number
+        1 // attempt_number
       );
 
       setQuestions(response.data.questions);
@@ -94,7 +98,9 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
         showFeedback: false,
         feedback: null,
         isCorrect: null,
-        questionStartTimes: new Array(response.data.questions.length).fill(0).map((_, i) => i === 0 ? now : 0),
+        questionStartTimes: new Array(response.data.questions.length)
+          .fill(0)
+          .map((_, i) => (i === 0 ? now : 0)),
       }));
       setQuizStarted(true);
     } catch (err: any) {
@@ -133,7 +139,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       "Tepat sekali! ",
       "Keren, kamu paham konsepnya! ",
       "Betul! Lanjutkan momentum belajarmu! ",
-      "Luar biasa, pemahamanmu solid! "
+      "Luar biasa, pemahamanmu solid! ",
     ];
 
     const incorrectPrefixes = [
@@ -141,7 +147,7 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       "Belum tepat, tapi jangan khawatir, ini bagian dari belajar. ",
       "Oops, masih kurang pas. Yuk kita bedah bareng! ",
       "Sedikit lagi! Coba perhatikan penjelasan berikut. ",
-      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. "
+      "Jawabanmu keliru, tapi ini kesempatan bagus untuk belajar. ",
     ];
 
     if (currentQuestion._rawOptions && currentQuestion.correctOptionId) {
@@ -151,23 +157,28 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
       // Smart Feedback Generation
       const prefix = isCorrect
         ? correctPrefixes[Math.floor(Math.random() * correctPrefixes.length)]
-        : incorrectPrefixes[Math.floor(Math.random() * incorrectPrefixes.length)];
+        : incorrectPrefixes[
+            Math.floor(Math.random() * incorrectPrefixes.length)
+          ];
 
       // Parse Explanation & Hint
       const rawExplanation = currentQuestion.explanation || "";
-      const explanationParts = rawExplanation.split('Hint:');
+      const explanationParts = rawExplanation.split("Hint:");
       const mainExplanation = explanationParts[0].trim();
-      const hintText = explanationParts.length > 1 ? explanationParts[1].trim() : null;
+      const hintText =
+        explanationParts.length > 1 ? explanationParts[1].trim() : null;
 
       // Combine for WS 1 UI
       feedback = `${prefix}\n\n${mainExplanation}`;
       if (hintText) {
         feedback += `\n\n💡 Hint: ${hintText}`;
       }
-
     } else {
       // Fallback for legacy or missing data
-      console.warn("Missing validation data for question", currentQuestion.question_id);
+      console.warn(
+        "Missing validation data for question",
+        currentQuestion.question_id
+      );
       feedback = "Feedback unavailable";
     }
 
@@ -239,22 +250,26 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
   // Show intro card if quiz hasn't started
   if (!quizStarted) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <IntroCard
-          totalQuestions={3}
-          isLoading={loading}
-          onStart={loadQuestions}
-        />
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-3xl mx-auto p-6">
+          <IntroCard
+            totalQuestions={3}
+            isLoading={loading}
+            onStart={loadQuestions}
+          />
+        </div>
       </div>
     );
   }
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-          <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
-          <p className="text-gray-600">Memuat pertanyaan...</p>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-3xl mx-auto p-6">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
+            <p className="text-gray-600">Memuat pertanyaan...</p>
+          </div>
         </div>
       </div>
     );
@@ -262,13 +277,18 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   if (error) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-          <h3 className="text-xl font-bold text-red-600">❌ Error</h3>
-          <p className="text-gray-700">{error}</p>
-          <button onClick={loadQuestions} className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all shadow-md hover:shadow-lg">
-            Coba Lagi
-          </button>
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-3xl mx-auto p-6">
+          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+            <h3 className="text-xl font-bold text-red-600">❌ Error</h3>
+            <p className="text-gray-700">{error}</p>
+            <button
+              onClick={loadQuestions}
+              className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all shadow-md hover:shadow-lg"
+            >
+              Coba Lagi
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -276,12 +296,14 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   if (quizState.isCompleted) {
     return (
-      <div className="max-w-3xl mx-auto p-6">
-        <ResultCard
-          score={quizState.score}
-          totalQuestions={questions.length}
-          onRetry={handleRetry}
-        />
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="max-w-3xl mx-auto p-6">
+          <ResultCard
+            score={quizState.score}
+            totalQuestions={questions.length}
+            onRetry={handleRetry}
+          />
+        </div>
       </div>
     );
   }
@@ -291,28 +313,35 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
     quizState.selectedAnswers[quizState.currentQuestionIndex];
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <ProgressCard
-        currentQuestion={quizState.currentQuestionIndex + 1}
-        totalQuestions={questions.length}
-        score={quizState.score}
-        attemptNumber={attemptNumber}
-      />
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-3xl mx-auto p-6">
+        <ProgressCard
+          currentQuestion={quizState.currentQuestionIndex + 1}
+          totalQuestions={questions.length}
+          score={quizState.score}
+          attemptNumber={attemptNumber}
+        />
 
-      <QuestionCard
-        question={currentQuestion}
-        questionNumber={quizState.currentQuestionIndex + 1}
-        totalQuestions={questions.length}
-        selectedAnswer={selectedAnswer}
-        onAnswerSelect={handleAnswerSelect}
-        onSubmit={handleSubmitAnswer}
-        onNext={handleNextQuestion}
-        showFeedback={quizState.showFeedback}
-        isCorrect={quizState.isCorrect}
-        feedback={quizState.feedback}
-        isLastQuestion={quizState.currentQuestionIndex === questions.length - 1}
-        questionStartTime={quizState.questionStartTimes[quizState.currentQuestionIndex] || Date.now()}
-      />
+        <QuestionCard
+          question={currentQuestion}
+          questionNumber={quizState.currentQuestionIndex + 1}
+          totalQuestions={questions.length}
+          selectedAnswer={selectedAnswer}
+          onAnswerSelect={handleAnswerSelect}
+          onSubmit={handleSubmitAnswer}
+          onNext={handleNextQuestion}
+          showFeedback={quizState.showFeedback}
+          isCorrect={quizState.isCorrect}
+          feedback={quizState.feedback}
+          isLastQuestion={
+            quizState.currentQuestionIndex === questions.length - 1
+          }
+          questionStartTime={
+            quizState.questionStartTimes[quizState.currentQuestionIndex] ||
+            Date.now()
+          }
+        />
+      </div>
     </div>
   );
 };
