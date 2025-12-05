@@ -9,9 +9,10 @@ import IntroCard from "./IntroCard";
 interface QuizContainerProps {
   tutorialId: string;
   userId: string;
+  isDark: boolean;
 }
 
-const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
+const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -296,14 +297,13 @@ const QuizContainer = ({ tutorialId, userId }: QuizContainerProps) => {
 
   if (quizState.isCompleted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-3xl mx-auto p-6">
-          <ResultCard
-            score={quizState.score}
-            totalQuestions={questions.length}
-            onRetry={handleRetry}
-          />
-        </div>
+      <div className="w-full">
+        <ResultCard
+          score={quizState.score}
+          totalQuestions={questions.length}
+          onRetry={handleRetry}
+          isDark={isDark}
+        />
       </div>
     );
   }
