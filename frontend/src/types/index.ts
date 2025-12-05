@@ -44,7 +44,7 @@ export interface IframeParams {
 
 // User Preferences
 export interface UserPreferences {
-  layoutWidth: "fullWidth" | "centered" | "compact";
+  layoutWidth: "fullWidth" | "mediumWidth";
   fontStyle: "default" | "serif" | "monospace";
   theme: "light" | "dark" | "auto";
   fontSize: "small" | "medium" | "large";

@@ -9,7 +9,6 @@ interface IntroCardProps {
 const IntroCard = ({ totalQuestions, isLoading, onStart }: IntroCardProps) => {
   return (
     <>
-      {/* Card wrapper */}
       <div className="flex items-center gap-3 pb-12">
         <h1 className="text-3xl md:text-4xl font-bold text-black dark:text-white">
           LearnCheck!

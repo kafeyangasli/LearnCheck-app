@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import QuizContainer from './components/QuizContainer';
-import { getIframeParams, isInIframe } from './utils/iframeParams';
-import { learnCheckApi } from './services/api';
-import type { IframeParams, UserPreferences } from './types';
-
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import QuizContainer from "./components/QuizContainer";
+import { getIframeParams, isInIframe } from "./utils/iframeParams";
+import { learnCheckApi } from "./services/api";
+import type { IframeParams, UserPreferences } from "./types";
 
 const queryClient = new QueryClient();
 
@@ -18,7 +17,7 @@ function App() {
     const iframeParams = getIframeParams();
 
     if (!iframeParams) {
-      setError('Missing required parameters: tutorial_id and user_id');
+      setError("Missing required parameters: tutorial_id and user_id");
       return;
     }
 
@@ -28,20 +27,21 @@ function App() {
   // Fetch user preferences when user_id changes
   useEffect(() => {
     if (params?.user_id) {
-      learnCheckApi.getUserPreferences(params.user_id)
+      learnCheckApi
+        .getUserPreferences(params.user_id)
         .then((prefs) => {
-          console.log('User preferences loaded:', prefs);
-          console.log('Theme value:', prefs.theme);
+          console.log("User preferences loaded:", prefs);
+          console.log("Theme value:", prefs.theme);
           setPreferences(prefs);
         })
         .catch((err) => {
-          console.error('Failed to load user preferences:', err);
+          console.error("Failed to load user preferences:", err);
           // Set default preferences on error
           setPreferences({
-            theme: 'light',
-            fontSize: 'medium',
-            fontStyle: 'default',
-            layoutWidth: 'centered',
+            theme: "light",
+            fontSize: "medium",
+            fontStyle: "default",
+            layoutWidth: "fullWidth",
           });
         });
     }
@@ -51,13 +51,27 @@ function App() {
     return (
       <div className="flex items-center justify-center min-h-screen p-6 bg-gray-50">
         <div className="max-w-lg w-full p-8 bg-white rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">⚠️ Kesalahan Konfigurasi</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+            ⚠️ Kesalahan Konfigurasi
+          </h2>
           <p className="text-gray-700 mb-4">{error}</p>
           <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-            <p className="font-semibold text-gray-900 mb-2">Parameter URL yang Diperlukan:</p>
+            <p className="font-semibold text-gray-900 mb-2">
+              Parameter URL yang Diperlukan:
+            </p>
             <ul className="list-disc list-inside space-y-1 text-gray-700 mb-4">
-              <li><code className="px-2 py-0.5 bg-gray-200 rounded text-sm">tutorial_id</code> - ID tutorial</li>
-              <li><code className="px-2 py-0.5 bg-gray-200 rounded text-sm">user_id</code> - ID pengguna</li>
+              <li>
+                <code className="px-2 py-0.5 bg-gray-200 rounded text-sm">
+                  tutorial_id
+                </code>{" "}
+                - ID tutorial
+              </li>
+              <li>
+                <code className="px-2 py-0.5 bg-gray-200 rounded text-sm">
+                  user_id
+                </code>{" "}
+                - ID pengguna
+              </li>
             </ul>
             <p className="font-semibold text-gray-900 mb-2">Contoh:</p>
             <code className="block p-2 bg-gray-200 rounded text-sm overflow-x-auto">
@@ -79,35 +93,50 @@ function App() {
   }
 
   // Apply preferences via CSS classes
-  const themeClass = preferences?.theme === 'dark' ? 'dark bg-gray-900' : '';
+  const themeClass =
+    preferences?.theme === "dark" ? "dark bg-gray-900" : "bg-white";
   const fontSizeClass =
-    preferences?.fontSize === 'small' ? 'text-sm' :
-      preferences?.fontSize === 'large' ? 'text-lg' : 'text-base';
+    preferences?.fontSize === "small"
+      ? "text-sm"
+      : preferences?.fontSize === "large"
+      ? "text-lg"
+      : "text-base";
   const fontStyleClass =
-    preferences?.fontStyle === 'serif' ? 'font-serif' :
-      preferences?.fontStyle === 'monospace' ? 'font-mono' : 'font-sans';
+    preferences?.fontStyle === "serif"
+      ? "font-serif"
+      : preferences?.fontStyle === "monospace"
+      ? "font-mono"
+      : "font-sans";
   const layoutWidthClass =
-    preferences?.layoutWidth === 'fullWidth' ? 'max-w-full' :
-      preferences?.layoutWidth === 'compact' ? 'max-w-4xl mx-auto' : 'max-w-6xl mx-auto';
+    preferences?.layoutWidth === "mediumWidth"
+      ? "max-w-[900px] mx-auto"
+      : "max-w-full";
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className={`
-        ${inIframe ? 'min-h-auto' : 'min-h-screen'}
+  <QueryClientProvider client={queryClient}>
+    <div
+      className={`
+        ${inIframe ? "min-h-0" : "min-h-screen"}
         ${themeClass}
-        ${fontSizeClass}
-        ${fontStyleClass}
-        ${layoutWidthClass}
-        transition-colors duration-200
-      `}>
+      `}
+    >
+      <div
+        className={`
+          ${fontSizeClass}
+          ${fontStyleClass}
+          ${layoutWidthClass}
+          px-4 md:px-6 py-6 md:py-10
+        `}
+      >
         <QuizContainer
           tutorialId={params.tutorial_id}
           userId={params.user_id}
+          isDark={preferences?.theme === "dark"}
         />
       </div>
-    </QueryClientProvider>
+    </div>
+  </QueryClientProvider>
   );
 }
 
 export default App;
-

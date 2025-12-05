@@ -75,10 +75,10 @@ export const learnCheckApi = {
       if (response.data?.userPreferences) {
         const pref = response.data.userPreferences;
         return {
-          theme: pref.theme || "light",
-          fontSize: pref.fontSize || "medium",
-          fontStyle: pref.fontStyle || "default",
-          layoutWidth: pref.layoutWidth || "centered",
+          theme: pref.theme,
+          fontSize: pref.fontSize,
+          fontStyle: pref.fontStyle,
+          layoutWidth: pref.layoutWidth,
         };
       }
 
@@ -87,7 +87,7 @@ export const learnCheckApi = {
         theme: "light",
         fontSize: "medium",
         fontStyle: "default",
-        layoutWidth: "centered",
+        layoutWidth: "fullWidth",
       };
     } catch (error) {
       console.error("Failed to fetch user preferences:", error);
@@ -96,7 +96,7 @@ export const learnCheckApi = {
         theme: "light",
         fontSize: "medium",
         fontStyle: "default",
-        layoutWidth: "centered",
+        layoutWidth: "fullWidth",
       };
     }
   },
