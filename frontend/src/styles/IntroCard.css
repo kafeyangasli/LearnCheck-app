@@ -1,0 +1,133 @@
+.intro-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 3rem;
+}
+
+.intro-title {
+  font-size: 1.875rem; /* text-3xl */
+  line-height: 2.25rem;
+  font-weight: 700;
+  color: #000000;
+}
+
+@media (min-width: 768px) {
+  .intro-title {
+    font-size: 2.25rem; /* text-4xl */
+    line-height: 2.5rem;
+  }
+}
+
+.dark .intro-title {
+  color: #ffffff;
+}
+
+.intro-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  background-color: #0284c7; /* sky-600 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.intro-icon svg {
+  width: 1rem;
+  height: 1rem;
+  color: #ffffff;
+}
+
+.intro-text,
+.intro-list,
+.intro-text-strong {
+  margin-bottom: 0.75rem;
+  font-size: 1rem; /* text-base */
+  line-height: 1.7;
+  color: #000000;
+}
+
+@media (min-width: 768px) {
+  .intro-text,
+  .intro-list,
+  .intro-text-strong {
+    font-size: 1.125rem; /* text-lg */
+  }
+}
+
+.dark .intro-text,
+.dark .intro-list,
+.dark .intro-text-strong {
+  color: #ffffff;
+}
+
+.intro-text-strong {
+  font-weight: 700;
+}
+
+.intro-list {
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+
+.intro-list li + li {
+  margin-top: 0.25rem;
+}
+
+.intro-button-row {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.intro-button {
+  width: 9rem; /* w-36 */
+  height: 3rem; /* h-12 */
+  border-radius: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #0284c7; /* sky-600 */
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.15s ease,
+    box-shadow 0.15s ease;
+  box-shadow: 0 4px 6px rgba(15, 23, 42, 0.25);
+}
+
+.intro-button:hover:not(.intro-button--disabled) {
+  background-color: #0369a1; /* sky-700 */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(15, 23, 42, 0.35);
+}
+
+.intro-button--disabled {
+  background-color: #e5e7eb; /* gray-300 */
+  color: #6b7280; /* gray-500 */
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+.intro-button-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

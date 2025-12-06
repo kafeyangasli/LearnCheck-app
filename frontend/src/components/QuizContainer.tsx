@@ -5,6 +5,7 @@ import QuestionCard from "./QuestionCard";
 import ProgressCard from "./ProgressCard";
 import ResultCard from "./ResultCard";
 import IntroCard from "./IntroCard";
+import "../styles/QuizContainer.css";
 
 interface QuizContainerProps {
   tutorialId: string;
@@ -251,8 +252,8 @@ const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
   // Show intro card if quiz hasn't started
   if (!quizStarted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-3xl mx-auto p-6">
+      <div className="quiz-wrapper">
+        <div className="quiz-inner">
           <IntroCard
             totalQuestions={3}
             isLoading={loading}
@@ -265,11 +266,11 @@ const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-3xl mx-auto p-6">
-          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-            <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
-            <p className="text-gray-600">Memuat pertanyaan...</p>
+      <div className="quiz-wrapper">
+        <div className="quiz-inner">
+          <div className="quiz-center">
+            <div className="quiz-spinner"></div>
+            <p>Memuat pertanyaan...</p>
           </div>
         </div>
       </div>
@@ -278,15 +279,12 @@ const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-3xl mx-auto p-6">
-          <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-            <h3 className="text-xl font-bold text-red-600">❌ Error</h3>
-            <p className="text-gray-700">{error}</p>
-            <button
-              onClick={loadQuestions}
-              className="px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition-all shadow-md hover:shadow-lg"
-            >
+      <div className="quiz-wrapper">
+        <div className="quiz-inner">
+          <div className="quiz-center">
+            <h3 className="quiz-error-title">❌ Error</h3>
+            <p className="quiz-error-text">{error}</p>
+            <button onClick={loadQuestions} className="quiz-button">
               Coba Lagi
             </button>
           </div>
@@ -297,13 +295,15 @@ const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
 
   if (quizState.isCompleted) {
     return (
-      <div className="w-full">
-        <ResultCard
-          score={quizState.score}
-          totalQuestions={questions.length}
-          onRetry={handleRetry}
-          isDark={isDark}
-        />
+      <div className="quiz-wrapper">
+        <div className="quiz-inner">
+          <ResultCard
+            score={quizState.score}
+            totalQuestions={questions.length}
+            onRetry={handleRetry}
+            isDark={isDark}
+          />
+        </div>
       </div>
     );
   }
@@ -313,13 +313,12 @@ const QuizContainer = ({ tutorialId, userId, isDark }: QuizContainerProps) => {
     quizState.selectedAnswers[quizState.currentQuestionIndex];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="max-w-3xl mx-auto p-6">
+    <div className="quiz-wrapper">
+      <div className="quiz-inner">
         <ProgressCard
           currentQuestion={quizState.currentQuestionIndex + 1}
           totalQuestions={questions.length}
           score={quizState.score}
-          attemptNumber={attemptNumber}
         />
 
         <QuestionCard

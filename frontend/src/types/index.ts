@@ -45,7 +45,7 @@ export interface IframeParams {
 // User Preferences
 export interface UserPreferences {
   layoutWidth: "fullWidth" | "mediumWidth";
-  fontStyle: "default" | "serif" | "monospace";
+  fontStyle: "default" | "serif" | "open-dyslexic";
   theme: "light" | "dark" | "auto";
   fontSize: "small" | "medium" | "large";
 }

@@ -1,4 +1,5 @@
 import { RotateCcw } from "lucide-react";
+import "../styles/ResultCard.css";
 
 interface ResultCardProps {
   score: number;
@@ -7,8 +8,6 @@ interface ResultCardProps {
   onHome?: () => void;
   isDark?: boolean;
 }
-
-
 
 const ResultCard = ({
   score,
@@ -32,121 +31,50 @@ const ResultCard = ({
   };
 
   return (
-    <div className="w-full flex justify-center mt-16">
-      <div
-        className={`
-          mt-30
-          max-w-[900px]
-          ${
-            isDark
-              ? "bg-slate-900 border-slate-700"
-              : "bg-white border-gray-200"
-          }
-          px-6 py-8 md:px-10 md:py-10
-        `}
-      >
-        {/* Title */}
-        <h1
-          className={`text-[32px] leading-[38px] font-bold mb-6 ${
-            isDark ? "text-white" : "text-gray-900"
+    <>
+      <div className="result-wrapper">
+        <div
+          className={`result-card ${
+            isDark ? "result-card--dark" : "result-card--light"
           }`}
         >
-          Hasil Akhir
-        </h1>
+          {/* Title */}
+          <h1 className="result-title">Hasil Akhir</h1>
 
-        {/* Stats Table */}
-        <div
-          className={`
-            grid grid-cols-3 divide-x py-5 mb-6 border-y
-            ${
-              isDark
-                ? "divide-slate-700 border-slate-700"
-                : "divide-gray-200 border-gray-200"
-            }
-          `}
-        >
-          {/* Total Soal */}
-          <div className="text-center px-4">
-            <p
-              className={`text-lg md:text-xl font-semibold mb-2 ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Total Soal
-            </p>
-            <p
-              className={`text-3xl md:text-4xl font-bold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {totalQuestions}
-            </p>
+          {/* Stats Table */}
+          <div className="result-stats-row">
+            {/* Total Soal */}
+            <div className="result-stats-cell">
+              <p className="result-stats-label">Total Soal</p>
+              <p className="result-stats-value">{totalQuestions}</p>
+            </div>
+
+            {/* Jawaban Benar */}
+            <div className="result-stats-cell">
+              <p className="result-stats-label">Jawaban Benar</p>
+              <p className="result-stats-value">{score}</p>
+            </div>
+
+            {/* Nilai Akhir */}
+            <div className="result-stats-cell">
+              <p className="result-stats-label">Nilai Akhir</p>
+              <p className="result-stats-value">{percentage}%</p>
+            </div>
           </div>
 
-          {/* Jawaban Benar */}
-          <div className="text-center px-4">
-            <p
-              className={`text-lg md:text-xl font-semibold mb-2 ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Jawaban Benar
-            </p>
-            <p
-              className={`text-3xl md:text-4xl font-bold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {score}
-            </p>
+          {/* Message */}
+          <div className="result-message">{getMessage()}</div>
+
+          {/* Action Buttons */}
+          <div className="result-button-row">
+            <button onClick={onRetry} className="result-retry-button">
+              <RotateCcw size={16} />
+              Coba Lagi
+            </button>
           </div>
-
-          {/* Nilai Akhir */}
-          <div className="text-center px-4">
-            <p
-              className={`text-lg md:text-xl font-semibold mb-2 ${
-                isDark ? "text-gray-300" : "text-gray-600"
-              }`}
-            >
-              Nilai Akhir
-            </p>
-            <p
-              className={`text-3xl md:text-4xl font-bold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {percentage}%
-            </p>
-          </div>
-        </div>
-
-        {/* Message */}
-        <div className="mb-6">
-          <p
-            className={`text-base leading-relaxed ${
-              isDark ? "text-gray-300" : "text-gray-700"
-            }`}
-          >
-            {getMessage()}
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={onRetry}
-            className="
-              w-36 h-12  inline-flex items-center justify-center gap-2
-              text-white text-lg font-semibold
-              transition-all rounded-lg bg-sky-600 hover:bg-sky-700 shadow-md hover:shadow-lg
-            "
-          >
-            <RotateCcw className="w-4 h-4" />
-            Coba Lagi
-          </button>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

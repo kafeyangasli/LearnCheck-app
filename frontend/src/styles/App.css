@@ -1,0 +1,184 @@
+/* Root wrapper untuk seluruh app */
+.app-root {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #111827;
+}
+
+/* Jika dirender di dalam iframe (min-h-0) */
+.app-root--embed {
+  min-height: 0;
+}
+
+/* Dark mode di root */
+.app-root--dark {
+  background-color: #0f172a; /* mirip bg-gray-900 */
+  color: #e5e7eb;
+}
+
+/* Inner container: padding dan layout umum */
+.app-inner {
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+/* Responsive padding seperti px-4 md:px-6 py-6 md:py-10 */
+@media (min-width: 768px) {
+  .app-inner {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
+/* Layout width berdasarkan preferences */
+.app-layout--fullWidth {
+  max-width: 100%;
+}
+
+.app-layout--mediumWidth {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Font size (base scaling) */
+.app-font-size--small {
+  font-size: 0.875rem; /* text-sm */
+}
+
+.app-font-size--medium {
+  font-size: 1rem; /* text-base */
+}
+
+.app-font-size--large {
+  font-size: 1.125rem; /* text-lg */
+}
+
+/* Font style */
+.app-font-style--default {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+}
+
+.app-font-style--serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.app-font-style--monospace {
+  font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}
+
+.app-font-style--open-dyslexic {
+  font-family: "OpenDyslexic", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+/* ================= Error Screen (missing params) ================= */
+
+.app-error-root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  background-color: #f9fafb;
+  box-sizing: border-box;
+}
+
+.app-error-card {
+  max-width: 32rem;
+  width: 100%;
+  padding: 2rem;
+  border-radius: 1.25rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+  box-sizing: border-box;
+}
+
+.app-error-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+.app-error-text {
+  margin-bottom: 1rem;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.app-error-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  background-color: #f3f4f6;
+}
+
+.app-error-box-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #111827;
+}
+
+.app-error-list {
+  margin: 0 0 1rem 1.25rem;
+  padding: 0;
+  list-style-type: disc;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.app-error-code {
+  display: inline-block;
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.375rem;
+  background-color: #e5e7eb;
+  font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.75rem;
+}
+
+.app-error-example {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background-color: #e5e7eb;
+  font-family: "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+  font-size: 0.8rem;
+  overflow-x: auto;
+}
+
+/* ================= Loading Screen (saat params belum ada) ================= */
+
+.app-loading-root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.app-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  border: 4px solid #e5e7eb;
+  border-top-color: #0f6fff;
+  animation: spin 1s linear infinite;
+}
+
+.app-loading-text {
+  color: #4b5563;
+  font-size: 0.95rem;
+}
+
+/* Animasi spin (spinner) */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

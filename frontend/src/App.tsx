@@ -4,6 +4,7 @@ import QuizContainer from "./components/QuizContainer";
 import { getIframeParams, isInIframe } from "./utils/iframeParams";
 import { learnCheckApi } from "./services/api";
 import type { IframeParams, UserPreferences } from "./types";
+import "./styles/App.css";
 
 const queryClient = new QueryClient();
 
@@ -49,33 +50,26 @@ function App() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen p-6 bg-gray-50">
-        <div className="max-w-lg w-full p-8 bg-white rounded-2xl shadow-lg">
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">
-            ⚠️ Kesalahan Konfigurasi
-          </h2>
-          <p className="text-gray-700 mb-4">{error}</p>
-          <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-            <p className="font-semibold text-gray-900 mb-2">
+      <div className="app-error-route">
+        <div className="app-error-card">
+          <h2 className="app-error-title">⚠️ Kesalahan Konfigurasi</h2>
+          <p className="app-error-text">{error}</p>
+          <div className="app-error-box">
+            <p className="app-error-box-title">
               Parameter URL yang Diperlukan:
             </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700 mb-4">
+            <ul className="app-error-list">
               <li>
-                <code className="px-2 py-0.5 bg-gray-200 rounded text-sm">
-                  tutorial_id
-                </code>{" "}
-                - ID tutorial
+                <span className="app-error-code">tutorial_id</span> - ID
+                tutorial
               </li>
               <li>
-                <code className="px-2 py-0.5 bg-gray-200 rounded text-sm">
-                  user_id
-                </code>{" "}
-                - ID pengguna
+                <span className="app-error-code">user_id</span> - ID pengguna
               </li>
             </ul>
-            <p className="font-semibold text-gray-900 mb-2">Contoh:</p>
-            <code className="block p-2 bg-gray-200 rounded text-sm overflow-x-auto">
-              {window.location.origin}?tutorial_id=35363&user_id=user123
+            <p className="app-error-box-title">Contoh:</p>
+            <code className="app-error-example">
+              {window.location.origin}?tutorial_id=35363&user_id=1
             </code>
           </div>
         </div>
@@ -85,57 +79,54 @@ function App() {
 
   if (!params) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
-        <div className="w-12 h-12 border-4 border-gray-200 border-t-primary rounded-full animate-spin"></div>
-        <p className="text-gray-600">Memuat...</p>
+      <div className="app-loading-root">
+        <div className="app-loading-spinner"></div>
+        <p className="app-loading-text">Memuat...</p>
       </div>
     );
   }
 
   // Apply preferences via CSS classes
-  const themeClass =
-    preferences?.theme === "dark" ? "dark bg-gray-900" : "bg-white";
-  const fontSizeClass =
-    preferences?.fontSize === "small"
-      ? "text-sm"
-      : preferences?.fontSize === "large"
-      ? "text-lg"
-      : "text-base";
-  const fontStyleClass =
-    preferences?.fontStyle === "serif"
-      ? "font-serif"
-      : preferences?.fontStyle === "monospace"
-      ? "font-mono"
-      : "font-sans";
-  const layoutWidthClass =
-    preferences?.layoutWidth === "mediumWidth"
-      ? "max-w-[900px] mx-auto"
-      : "max-w-full";
+  // Derive preferences dengan default
+  const theme = preferences?.theme ?? "light";
+  const fontSize = preferences?.fontSize ?? "medium";
+  const fontStyle = preferences?.fontStyle ?? "default";
+  const layoutWidth = preferences?.layoutWidth ?? "fullWidth";
 
+  const rootClassNames = [
+    "app-root",
+    inIframe ? "app-root--embed" : "",
+    theme === "dark" ? "dark app-root--dark" : "app-root--light",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const innerClassNames = [
+    "app-inner",
+    `app-font-size--${fontSize}`,
+    fontStyle === "serif"
+      ? "app-font-style--serif"
+      : fontStyle === "open-dyslexic"
+      ? "app-font-style--open-dyslexic"
+      : "app-font-style--default",
+    layoutWidth === "mediumWidth"
+      ? "app-layout--mediumWidth"
+      : "app-layout--fullWidth",
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
-  <QueryClientProvider client={queryClient}>
-    <div
-      className={`
-        ${inIframe ? "min-h-0" : "min-h-screen"}
-        ${themeClass}
-      `}
-    >
-      <div
-        className={`
-          ${fontSizeClass}
-          ${fontStyleClass}
-          ${layoutWidthClass}
-          px-4 md:px-6 py-6 md:py-10
-        `}
-      >
-        <QuizContainer
-          tutorialId={params.tutorial_id}
-          userId={params.user_id}
-          isDark={preferences?.theme === "dark"}
-        />
+    <QueryClientProvider client={queryClient}>
+      <div className={rootClassNames}>
+        <div className={innerClassNames}>
+          <QuizContainer
+            tutorialId={params.tutorial_id}
+            userId={params.user_id}
+            isDark={theme === "dark"}
+          />
+        </div>
       </div>
-    </div>
-  </QueryClientProvider>
+    </QueryClientProvider>
   );
 }
 
