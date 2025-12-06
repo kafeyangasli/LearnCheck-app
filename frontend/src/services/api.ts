@@ -1,5 +1,6 @@
 import axios from "axios";
-import type { QuestionResponse, UserPreferences } from "../types";
+import type { QuestionResponse } from "../features/quiz/types";
+import type { UserPreferences } from "../types";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4001";
 
@@ -32,7 +33,6 @@ export const learnCheckApi = {
       }
 
       if (response.status === 202 && retries > 0) {
-        // Wait 2 seconds before retrying
         await new Promise((resolve) => setTimeout(resolve, 2000));
         return poll(retries - 1);
       }
@@ -40,7 +40,6 @@ export const learnCheckApi = {
       throw new Error("Assessment generation timed out or failed");
     };
 
-    // Start polling
     const data = await poll();
     const newQuestions = data.assessment.questions;
 
@@ -82,7 +81,6 @@ export const learnCheckApi = {
         };
       }
 
-      // Return defaults if response format is unexpected
       return {
         theme: "light",
         fontSize: "medium",
@@ -91,7 +89,6 @@ export const learnCheckApi = {
       };
     } catch (error) {
       console.error("Failed to fetch user preferences:", error);
-      // Return defaults on error
       return {
         theme: "light",
         fontSize: "medium",
