@@ -26,65 +26,7 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
         questionStartTimes: [],
     });
 
-    const STORAGE_KEY = `quiz_state_${tutorialId}_${userId}`;
-
-    useEffect(() => {
-        const savedState = localStorage.getItem(STORAGE_KEY);
-
-        if (savedState) {
-            try {
-                const {
-                    questions: savedQuestions,
-                    quizState: savedQuizState,
-                    attemptNumber: savedAttempt,
-                } = JSON.parse(savedState);
-
-                if (savedQuestions && savedQuestions.length > 0) {
-                    setQuestions(savedQuestions);
-                    setQuizState(savedQuizState);
-                    setAttemptNumber(savedAttempt || 1);
-                    setQuizStarted(true);
-                    return;
-                }
-            } catch (e) {
-                localStorage.removeItem(STORAGE_KEY);
-            }
-        } else {
-            setQuestions([]);
-            setQuizStarted(false);
-            setQuizState({
-                currentQuestionIndex: 0,
-                selectedAnswers: [],
-                showFeedback: false,
-                feedback: null,
-                isCorrect: null,
-                score: 0,
-                isCompleted: false,
-                startTime: Date.now(),
-                questionStartTimes: [],
-            });
-            setAttemptNumber(1);
-        }
-    }, [tutorialId, userId]);
-
-    useEffect(() => {
-        if (!loading && questions.length > 0) {
-            const stateToSave = {
-                questions,
-                quizState,
-                attemptNumber,
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
-        }
-    }, [questions, quizState, attemptNumber, loading]);
-
-    // Background fetch on mount if no saved state
-    useEffect(() => {
-        const savedState = localStorage.getItem(STORAGE_KEY);
-        if (!savedState && !quizStarted && questions.length === 0 && !loading && !error) {
-            loadQuestions(false);
-        }
-    }, []);
+    const STORAGE_KEY = `quiz_state_${tutorialId}`;
 
     const loadQuestions = async (autoStart = false) => {
         try {
@@ -125,6 +67,60 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        const savedState = localStorage.getItem(STORAGE_KEY);
+
+        if (savedState) {
+            try {
+                const {
+                    questions: savedQuestions,
+                    quizState: savedQuizState,
+                    attemptNumber: savedAttempt,
+                } = JSON.parse(savedState);
+
+                if (savedQuestions && savedQuestions.length > 0) {
+                    setQuestions(savedQuestions);
+                    setQuizState(savedQuizState);
+                    setAttemptNumber(savedAttempt || 1);
+                    setQuizStarted(true);
+                    return;
+                }
+            } catch (e) {
+                localStorage.removeItem(STORAGE_KEY);
+            }
+        }
+
+        // If not found in storage (new user/tutorial), reset state
+        setQuestions([]);
+        setQuizStarted(false);
+        setQuizState({
+            currentQuestionIndex: 0,
+            selectedAnswers: [],
+            showFeedback: false,
+            feedback: null,
+            isCorrect: null,
+            score: 0,
+            isCompleted: false,
+            startTime: Date.now(),
+            questionStartTimes: [],
+        });
+        setAttemptNumber(1);
+
+        // And start background fetch
+        loadQuestions(false);
+    }, [tutorialId, userId]);
+
+    useEffect(() => {
+        if (!loading && questions.length > 0) {
+            const stateToSave = {
+                questions,
+                quizState,
+                attemptNumber,
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(stateToSave));
+        }
+    }, [questions, quizState, attemptNumber, loading]);
 
     const startQuiz = () => {
         setQuizStarted(true);

@@ -1,29 +1,20 @@
 import { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import QuizContainer from "./features/quiz/components/QuizContainer";
-import { getIframeParams, isInIframe } from "./utils/iframeParams";
+import { isInIframe } from "./utils/iframeParams";
 import { learnCheckApi } from "./services/api";
-import type { IframeParams, UserPreferences } from "./types";
+import type { UserPreferences } from "./types";
 import { cn } from "./lib/utils";
 
 const queryClient = new QueryClient();
 
+import { useIframeParams } from "./hooks/useIframeParams";
+
 function App() {
-  const [params, setParams] = useState<IframeParams | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { params, error: paramsError } = useIframeParams();
   const [preferences, setPreferences] = useState<UserPreferences | null>(null);
   const inIframe = isInIframe();
-
-  useEffect(() => {
-    const iframeParams = getIframeParams();
-
-    if (!iframeParams) {
-      setError("Missing required parameters: tutorial_id and user_id");
-      return;
-    }
-
-    setParams(iframeParams);
-  }, []);
+  const error = paramsError;
 
   useEffect(() => {
     if (params?.user_id) {
