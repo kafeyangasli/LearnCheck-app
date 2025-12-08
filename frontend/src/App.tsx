@@ -41,7 +41,9 @@ function App() {
           <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-white">
             ⚠️ Kesalahan Konfigurasi
           </h2>
-          <p className="mb-4 text-slate-700 dark:text-slate-300 text-[0.95rem]">{error}</p>
+          <p className="mb-4 text-slate-700 dark:text-slate-300 text-[0.95rem]">
+            {error}
+          </p>
           <div className="mt-6 p-4 rounded-xl bg-slate-100 dark:bg-slate-700/50">
             <p className="font-semibold mb-2 text-slate-900 dark:text-white">
               Parameter URL yang Diperlukan:
@@ -60,7 +62,9 @@ function App() {
                 - ID pengguna
               </li>
             </ul>
-            <p className="font-semibold mb-2 text-slate-900 dark:text-white">Contoh:</p>
+            <p className="font-semibold mb-2 text-slate-900 dark:text-white">
+              Contoh:
+            </p>
             <code className="block mt-2 p-2 rounded-md bg-slate-200 dark:bg-slate-600 font-mono text-[0.8rem] overflow-x-auto text-slate-900 dark:text-slate-100">
               {window.location.origin}?tutorial_id=35363&user_id=1
             </code>
@@ -74,7 +78,9 @@ function App() {
     return (
       <div className="min-h-screen flex justify-center items-center flex-col gap-4 bg-slate-50 dark:bg-slate-900">
         <div className="w-12 h-12 rounded-full border-4 border-slate-200 border-t-primary-600 animate-spin"></div>
-        <p className="text-slate-600 dark:text-slate-400 text-[0.95rem]">Memuat...</p>
+        <p className="text-slate-600 dark:text-slate-400 text-[0.95rem]">
+          Memuat...
+        </p>
       </div>
     );
   }
@@ -88,36 +94,36 @@ function App() {
     fontSize === "small"
       ? "text-sm"
       : fontSize === "large"
-        ? "text-lg"
-        : "text-base";
+      ? "text-lg"
+      : "text-base";
 
   const fontStyleClass =
     fontStyle === "serif"
       ? "font-serif"
       : fontStyle === "open-dyslexic"
-        ? "font-[OpenDyslexic,sans-serif]"
-        : "font-sans";
+      ? "font-[OpenDyslexic,sans-serif]"
+      : "font-sans";
 
   const layoutClass =
     layoutWidth === "mediumWidth" ? "max-w-3xl mx-auto" : "max-w-full mx-auto";
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className={cn(
-        "bg-slate-50 text-slate-900 transition-colors duration-300 box-border",
-        inIframe ? "min-h-full p-3 sm:p-4" : "min-h-screen p-4 sm:p-6 lg:p-8",
-        theme === "dark" ? "dark bg-slate-900 text-slate-200" : "",
-        fontSizeClass,
-        fontStyleClass
-      )}>
-        <div className={cn(
-          "mx-auto",
-          layoutClass
-        )}>
+      <div
+        className={cn(
+          "bg-slate-50 text-slate-900 transition-colors duration-300 box-border",
+          inIframe ? "min-h-full p-3 sm:p-4" : "min-h-screen p-4 sm:p-6 lg:p-8",
+          theme === "dark" ? "dark bg-slate-900 text-slate-200" : "",
+          fontSizeClass,
+          fontStyleClass
+        )}
+      >
+        <div className={cn("mx-auto", layoutClass)}>
           <QuizContainer
             tutorialId={params.tutorial_id}
             userId={params.user_id}
             isDark={theme === "dark"}
+            fontSize={fontSize}
           />
         </div>
       </div>

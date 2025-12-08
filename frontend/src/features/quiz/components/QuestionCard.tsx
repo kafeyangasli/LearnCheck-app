@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { Check, X, Clock, Lightbulb } from "lucide-react";
 import type { Question } from "../types";
 import { cn } from "../../../lib/utils";
+import type { UserPreferences } from "../../../types";
+import {
+  bodyTextClassByFontSize,
+  buttonTextClassByFontSize,
+} from "../utils/fontSize";
 
 interface QuestionCardProps {
   question: Question;
@@ -17,6 +22,7 @@ interface QuestionCardProps {
   isLastQuestion: boolean;
   questionStartTime: number;
   onTimeout: () => void;
+  fontSize: UserPreferences["fontSize"];
 }
 
 const QuestionCard = ({
@@ -33,6 +39,7 @@ const QuestionCard = ({
   isLastQuestion,
   questionStartTime,
   onTimeout,
+  fontSize,
 }: QuestionCardProps) => {
   const QUESTION_TIME_LIMIT = 180;
 
@@ -116,14 +123,19 @@ const QuestionCard = ({
     return "neutral";
   };
 
-  const progress = ((questionNumber) / totalQuestions) * 100;
+  const progress = (questionNumber / totalQuestions) * 100;
 
   return (
     <div className="w-full bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
       {/* Header Section */}
       <div className="p-6 md:p-8 pb-0">
         <div className="flex items-center justify-between mb-6">
-          <span className="text-lg font-bold text-slate-900 dark:text-white">
+          <span
+            className={cn(
+              "text-slate-900 dark:text-white font-bold",
+              bodyTextClassByFontSize[fontSize]
+            )}
+          >
             Pertanyaan {questionNumber} dari {totalQuestions}
           </span>
           <div className="inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded bg-sky-100 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400 text-sm font-bold">
@@ -146,7 +158,8 @@ const QuestionCard = ({
         <div className="flex flex-col gap-4">
           {question.options.map((option, index) => {
             const status = getOptionStatus(index);
-            const optionText = typeof option === "object" ? option.text : option;
+            const optionText =
+              typeof option === "object" ? option.text : option;
             const isClickable = !showFeedback;
 
             return (
@@ -155,35 +168,59 @@ const QuestionCard = ({
                 onClick={() => isClickable && onAnswerSelect(index)}
                 className={cn(
                   "group flex items-center justify-between p-4 md:p-5 rounded-lg border transition-all duration-200",
-                  !isClickable ? "cursor-default" : "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50",
+                  !isClickable
+                    ? "cursor-default"
+                    : "cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50",
 
-                  status === "neutral" && "border-slate-200 dark:border-slate-700 bg-transparent",
+                  status === "neutral" &&
+                    "border-slate-200 dark:border-slate-700 bg-transparent",
 
-                  status === "selected" && !showFeedback && "border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-700/30",
+                  status === "selected" &&
+                    !showFeedback &&
+                    "border-slate-400 dark:border-slate-500 bg-slate-50 dark:bg-slate-700/30",
 
-                  status === "correct" && "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10",
+                  status === "correct" &&
+                    "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10",
 
-                  status === "incorrect" && "border-red-400 bg-red-50 dark:bg-red-500/10"
+                  status === "incorrect" &&
+                    "border-red-400 bg-red-50 dark:bg-red-500/10"
                 )}
               >
                 <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "w-6 h-6 shrink-0 rounded-full border flex items-center justify-center transition-all",
+                  <div
+                    className={cn(
+                      "w-6 h-6 shrink-0 rounded-full border flex items-center justify-center transition-all",
+                      status === "neutral" &&
+                        "border-slate-400 dark:border-slate-500 group-hover:border-slate-500",
 
-                    status === "neutral" && "border-slate-400 dark:border-slate-500 group-hover:border-slate-500",
+                      status === "selected" &&
+                        !showFeedback &&
+                        "border-slate-900 dark:border-white bg-transparent",
 
-                    status === "selected" && !showFeedback && "border-slate-900 dark:border-white bg-transparent",
+                      status === "correct" &&
+                        "border-emerald-500 bg-emerald-500 text-white",
 
-                    status === "correct" && "border-emerald-500 bg-emerald-500 text-white",
-
-                    status === "incorrect" && "border-red-500 bg-red-500 text-white"
-                  )}>
-                    {status === "correct" && <Check className="w-4 h-4" strokeWidth={3} />}
-                    {status === "incorrect" && <X className="w-4 h-4" strokeWidth={3} />}
-                    {status === "selected" && !showFeedback && <div className="w-3 h-3 rounded-full bg-slate-900 dark:bg-white" />}
+                      status === "incorrect" &&
+                        "border-red-500 bg-red-500 text-white"
+                    )}
+                  >
+                    {status === "correct" && (
+                      <Check className="w-4 h-4" strokeWidth={3} />
+                    )}
+                    {status === "incorrect" && (
+                      <X className="w-4 h-4" strokeWidth={3} />
+                    )}
+                    {status === "selected" && !showFeedback && (
+                      <div className="w-3 h-3 rounded-full bg-slate-900 dark:bg-white" />
+                    )}
                   </div>
 
-                  <span className="text-base font-medium text-slate-700 dark:text-slate-200">
+                  <span
+                    className={cn(
+                      "font-medium text-slate-700 dark:text-slate-200",
+                      bodyTextClassByFontSize[fontSize]
+                    )}
+                  >
                     {optionText}
                   </span>
                 </div>
@@ -204,7 +241,12 @@ const QuestionCard = ({
           <h3 className="text-xl font-bold mb-3 text-slate-900 dark:text-white">
             Penjelasan
           </h3>
-          <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 mb-6">
+          <p
+            className={cn(
+              "leading-relaxed text-slate-700 dark:text-slate-300 mb-6",
+              bodyTextClassByFontSize[fontSize]
+            )}
+          >
             {mainText}
           </p>
 
@@ -213,10 +255,20 @@ const QuestionCard = ({
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-cyan-600 dark:text-cyan-400 mt-0.5 shrink-0" />
                 <div>
-                  <span className="block text-sm font-bold text-cyan-700 dark:text-cyan-300 mb-1">
+                  <span
+                    className={cn(
+                      "block font-bold text-cyan-700 dark:text-cyan-300 mb-1",
+                      bodyTextClassByFontSize[fontSize]
+                    )}
+                  >
                     Hint
                   </span>
-                  <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                  <p
+                    className={cn(
+                      "leading-relaxed text-slate-700 dark:text-slate-300",
+                      bodyTextClassByFontSize[fontSize]
+                    )}
+                  >
                     {hint}
                   </p>
                 </div>
@@ -232,7 +284,8 @@ const QuestionCard = ({
             onClick={onSubmit}
             disabled={selectedAnswer === null}
             className={cn(
-              "px-8 py-3 rounded-lg text-base font-semibold border-none transition-all shadow-sm text-white",
+              "px-8 py-3 rounded-lg  font-semibold border-none transition-all shadow-sm text-white",
+              buttonTextClassByFontSize[fontSize],
               selectedAnswer !== null
                 ? "bg-blue-600 hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-md cursor-pointer"
                 : "bg-slate-200 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
@@ -243,7 +296,10 @@ const QuestionCard = ({
         ) : (
           <button
             onClick={onNext}
-            className="px-8 py-3 rounded-lg text-base font-semibold border-none cursor-pointer transition-all shadow-sm bg-blue-600 text-white hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-md"
+            className={cn(
+              "px-8 py-3 rounded-lg font-semibold border-none cursor-pointer transition-all shadow-sm bg-blue-600 text-white hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-md",
+              buttonTextClassByFontSize[fontSize]
+            )}
           >
             {isLastQuestion ? "Akhiri Kuis" : "Soal Berikutnya"}
           </button>
