@@ -1,5 +1,11 @@
 import { RotateCcw } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import type { UserPreferences } from "../../../types";
+import {
+  bodyTextClassByFontSize,
+  smallTextClassByFontSize,
+  buttonTextClassByFontSize,
+} from "../utils/fontSize";
 
 interface ResultCardProps {
   score: number;
@@ -7,6 +13,7 @@ interface ResultCardProps {
   onRetry: () => void;
   onHome?: () => void;
   isDark?: boolean;
+  fontSize: UserPreferences["fontSize"];
 }
 
 const ResultCard = ({
@@ -15,6 +22,7 @@ const ResultCard = ({
   onRetry,
   onHome,
   isDark = false,
+  fontSize,
 }: ResultCardProps) => {
   const percentage = Math.round((score / totalQuestions) * 100);
 
@@ -48,34 +56,69 @@ const ResultCard = ({
 
           <div className="grid grid-cols-3 border-y border-slate-200 dark:border-slate-700 py-5 mb-6">
             <div className="text-center px-4 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-              <p className="text-lg font-semibold mb-2 text-slate-600 dark:text-slate-300">
+              <p
+                className={cn(
+                  "font-semibold mb-2 text-slate-600 dark:text-slate-300",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 Total Soal
               </p>
-              <p className="text-[32px] font-bold text-slate-900 dark:text-white">
+              <p
+                className={cn(
+                  "font-bold text-slate-900 dark:text-white",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 {totalQuestions}
               </p>
             </div>
 
             <div className="text-center px-4 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-              <p className="text-lg font-semibold mb-2 text-slate-600 dark:text-slate-300">
+              <p
+                className={cn(
+                  "font-semibold mb-2 text-slate-600 dark:text-slate-300",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 Jawaban Benar
               </p>
-              <p className="text-[32px] font-bold text-slate-900 dark:text-white">
+              <p
+                className={cn(
+                  "font-bold text-slate-900 dark:text-white",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 {score}
               </p>
             </div>
 
             <div className="text-center px-4 border-r border-slate-200 dark:border-slate-700 last:border-r-0">
-              <p className="text-lg font-semibold mb-2 text-slate-600 dark:text-slate-300">
+              <p
+                className={cn(
+                  "font-semibold mb-2 text-slate-600 dark:text-slate-300",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 Nilai Akhir
               </p>
-              <p className="text-[32px] font-bold text-slate-900 dark:text-white">
+              <p
+                className={cn(
+                  "font-bold text-slate-900 dark:text-white",
+                  smallTextClassByFontSize[fontSize]
+                )}
+              >
                 {percentage}%
               </p>
             </div>
           </div>
 
-          <div className="mb-6 text-base leading-relaxed text-slate-700 dark:text-slate-300">
+          <div
+            className={cn(
+              "mb-6 leading-relaxed text-slate-700 dark:text-slate-300",
+              bodyTextClassByFontSize[fontSize]
+            )}
+          >
             {getMessage()}
           </div>
 
@@ -83,14 +126,19 @@ const ResultCard = ({
             {onHome && (
               <button
                 onClick={onHome}
-                className="w-full sm:w-auto px-6 h-12 inline-flex items-center justify-center gap-2 text-base font-semibold rounded-lg border-none cursor-pointer bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-600 order-2 sm:order-1"
+                className={cn(
+                  "w-full sm:w-auto px-6 h-12 inline-flex items-center justify-center gap-2  font-semibold rounded-lg border-none cursor-pointer bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-slate-600 order-2 sm:order-1"
+                )}
               >
                 Kembali ke Beranda
               </button>
             )}
             <button
               onClick={onRetry}
-              className="w-full sm:w-auto px-6 h-12 inline-flex items-center justify-center gap-2 text-base font-semibold rounded-lg border-none cursor-pointer bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg hover:-translate-y-px order-1 sm:order-2"
+              className={cn(
+                "w-full sm:w-auto px-6 h-12 inline-flex items-center justify-center gap-2 font-semibold rounded-lg border-none cursor-pointer bg-blue-600 text-white shadow-md transition-all hover:bg-blue-700 hover:shadow-lg hover:-translate-y-px order-1 sm:order-2",
+                buttonTextClassByFontSize[fontSize]
+              )}
             >
               <RotateCcw size={16} />
               Coba Lagi

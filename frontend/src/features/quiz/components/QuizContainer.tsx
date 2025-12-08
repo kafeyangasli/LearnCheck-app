@@ -4,18 +4,20 @@ import IntroCard from "./IntroCard";
 import ResultCard from "./ResultCard";
 import SkeletonLoader from "../../../components/SkeletonLoader";
 import { useQuiz } from "../hooks/useQuiz";
-
+import type { UserPreferences } from "../../../types";
 
 interface QuizContainerProps {
   tutorialId: string;
   userId: string;
   isDark?: boolean;
+  fontSize: UserPreferences["fontSize"];
 }
 
 const QuizContainer = ({
   tutorialId,
   userId,
   isDark = false,
+  fontSize,
 }: QuizContainerProps) => {
   const {
     questions,
@@ -75,6 +77,7 @@ const QuizContainer = ({
             totalQuestions={questions.length || 3}
             isLoading={isLoading}
             onStart={startQuiz}
+            fontSize={fontSize}
           />
         </div>
       </div>
@@ -89,6 +92,7 @@ const QuizContainer = ({
         onRetry={handleRestart}
         onHome={handleRetry}
         isDark={isDark}
+        fontSize={fontSize}
       />
     );
   }
@@ -116,6 +120,7 @@ const QuizContainer = ({
           }
           questionStartTime={quizState.startTime}
           onTimeout={handleTimeout}
+          fontSize={fontSize}
         />
       </div>
     </div>
