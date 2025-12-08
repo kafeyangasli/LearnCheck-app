@@ -26,7 +26,7 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
         questionStartTimes: [],
     });
 
-    const STORAGE_KEY = `quiz_state_${tutorialId}`;
+    const STORAGE_KEY = `quiz_state_${tutorialId}_${userId}`;
 
     const loadQuestions = async (autoStart = false) => {
         try {
@@ -79,13 +79,18 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
                     attemptNumber: savedAttempt,
                 } = JSON.parse(savedState);
 
-                if (savedQuestions && savedQuestions.length > 0) {
+                // Only restore if quiz is NOT completed (in-progress)
+                if (savedQuestions && savedQuestions.length > 0 && !savedQuizState.isCompleted) {
                     setQuestions(savedQuestions);
                     setQuizState(savedQuizState);
                     setAttemptNumber(savedAttempt || 1);
-                    setQuizStarted(true);
+                    // Only set quizStarted if user actually started the quiz
+                    setQuizStarted(savedQuizState.currentQuestionIndex > 0 || savedQuizState.selectedAnswers.some((a: number | null) => a !== null));
                     return;
                 }
+
+                // If completed, clear old state
+                localStorage.removeItem(STORAGE_KEY);
             } catch (e) {
                 localStorage.removeItem(STORAGE_KEY);
             }
@@ -112,7 +117,7 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
     }, [tutorialId, userId]);
 
     useEffect(() => {
-        if (!loading && questions.length > 0) {
+        if (!loading && questions.length > 0 && quizStarted) {
             const stateToSave = {
                 questions,
                 quizState,
