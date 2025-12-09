@@ -13,7 +13,7 @@ import logger from "../config/logger";
 
 const CACHE_CONFIG = {
   QUIZ_TTL: 24 * 60 * 60,
-  PREFERENCES_TTL: 5 * 60,
+  PREFERENCES_TTL: 5,
   RATE_LIMIT_WINDOW: 60,
   MAX_REQUESTS_PER_MINUTE: 10,
   SESSION_TTL: 60 * 60,
