@@ -1,6 +1,6 @@
 # LearnCheck App
 
-LearnCheck adalah aplikasi kuis interaktif yang dirancang untuk diintegrasikan ke dalam platform LMS (seperti Dicoding Classroom Mock) menggunakan iFrame. Aplikasi ini memanfaatkan Generative AI (Gemini) untuk menghasilkan soal-soal formatif secara otomatis berdasarkan konteks materi yang sedang dipelajari siswa.
+LearnCheck adalah aplikasi kuis interaktif yang dirancang untuk diintegrasikan ke dalam platform LMS (seperti Dicoding Classroom) menggunakan iFrame. Aplikasi ini memanfaatkan Generative AI (Gemini) untuk menghasilkan soal-soal formatif secara otomatis berdasarkan konteks materi yang sedang dipelajari siswa.
 
 ## Fitur Utama
 
