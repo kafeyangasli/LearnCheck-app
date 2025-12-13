@@ -18,10 +18,8 @@ export const useIframeParams = () => {
             }
         };
 
-        // Check on mount
         handleUrlChange();
 
-        // Listen for URL changes
         window.addEventListener("popstate", handleUrlChange);
         window.addEventListener("hashchange", handleUrlChange);
 

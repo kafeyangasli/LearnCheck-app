@@ -35,7 +35,7 @@ const QuizContainer = ({
     startQuiz,
   } = useQuiz({ tutorialId, userId });
 
-  // Apply dark mode class to html element
+  // dark mode
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");

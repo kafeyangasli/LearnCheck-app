@@ -79,24 +79,20 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
                     attemptNumber: savedAttempt,
                 } = JSON.parse(savedState);
 
-                // Only restore if quiz is NOT completed (in-progress)
                 if (savedQuestions && savedQuestions.length > 0 && !savedQuizState.isCompleted) {
                     setQuestions(savedQuestions);
                     setQuizState(savedQuizState);
                     setAttemptNumber(savedAttempt || 1);
-                    // Only set quizStarted if user actually started the quiz
                     setQuizStarted(savedQuizState.currentQuestionIndex > 0 || savedQuizState.selectedAnswers.some((a: number | null) => a !== null));
                     return;
                 }
 
-                // If completed, clear old state
                 localStorage.removeItem(STORAGE_KEY);
             } catch (e) {
                 localStorage.removeItem(STORAGE_KEY);
             }
         }
 
-        // If not found in storage (new user/tutorial), reset state
         setQuestions([]);
         setQuizStarted(false);
         setQuizState({
@@ -112,7 +108,6 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
         });
         setAttemptNumber(1);
 
-        // And start background fetch
         loadQuestions(false);
     }, [tutorialId, userId]);
 
@@ -251,7 +246,6 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
             questionStartTimes: [],
         });
 
-        // Trigger background fetch again
         loadQuestions(false);
     };
 
@@ -275,7 +269,7 @@ export const useQuiz = ({ tutorialId, userId }: UseQuizProps) => {
             questionStartTimes: [],
         });
 
-        loadQuestions(true); // Auto start for restart
+        loadQuestions(true);
     };
 
     return {
