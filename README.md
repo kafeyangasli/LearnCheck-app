@@ -1,16 +1,16 @@
-# LearnCheck App 🎓
+# LearnCheck App
 
-**LearnCheck** adalah aplikasi kuis interaktif yang dirancang untuk diintegrasikan ke dalam platform LMS (seperti Dicoding Classroom Mock) menggunakan iFrame. Aplikasi ini memanfaatkan **Generative AI (Gemini)** untuk menghasilkan soal-soal formatif secara otomatis berdasarkan konteks materi yang sedang dipelajari siswa.
+LearnCheck adalah aplikasi kuis interaktif yang dirancang untuk diintegrasikan ke dalam platform LMS (seperti Dicoding Classroom Mock) menggunakan iFrame. Aplikasi ini memanfaatkan Generative AI (Gemini) untuk menghasilkan soal-soal formatif secara otomatis berdasarkan konteks materi yang sedang dipelajari siswa.
 
-## 🌟 Fitur Utama
+## Fitur Utama
 
 *   **AI-Powered Assessment**: Menghasilkan soal pilihan ganda (multiple choice) secara otomatis menggunakan Google Gemini AI.
-*   **Seamless Integration**: Dirancang untuk di-embed via iFrame dengan dukungan parameter URL (`tutorial_id`, `user_id`).
+*   **Seamless Integration**: Dirancang untuk di-embed via iFrame dengan dukungan parameter URL (tutorial_id, user_id).
 *   **Adaptive UI**: Tampilan yang responsif dan mengikuti tema LMS (mendukung Dark Mode, pengaturan Font Size, dan gaya Font).
 *   **State Persistence**: Menyimpan progress pengerjaan kuis di browser siswa, sehingga data aman meskipun berpindah halaman (selama sesi/user valid).
 *   **Background Processing**: Menggunakan sistem antrian (Queue) untuk generate soal yang berat agar tidak membebani user experience.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 *   **Framework**: React (Vite)
@@ -26,13 +26,13 @@
 *   **Cache & Broker**: Redis
 *   **Language**: TypeScript
 
-## 📋 Prasyarat
+## Prasyarat
 
 Sebelum menjalankan aplikasi, pastikan Anda telah menginstal:
-*   [Node.js](https://nodejs.org/) (v18+)
-*   [Redis](https://redis.io/) (Wajib untuk backend queue system)
+*   Node.js (v18+)
+*   Redis (Wajib untuk backend queue system)
 
-## 🚀 Cara Menjalankan Aplikasi
+## Cara Menjalankan Aplikasi
 
 ### 1. Setup Backend
 Masuk ke folder backend, instal dependensi, dan atur environment variables.
@@ -43,7 +43,7 @@ npm install
 cp .env.example .env
 ```
 
-**Konfigurasi `.env` Backend:**
+**Konfigurasi .env Backend:**
 Pastikan Redis berjalan dan Anda memiliki API Key Gemini.
 ```env
 PORT=4001
@@ -66,7 +66,7 @@ npm install
 cp .env.example .env
 ```
 
-**Konfigurasi `.env` Frontend:**
+**Konfigurasi .env Frontend:**
 ```env
 VITE_API_URL=http://localhost:4001
 ```
@@ -77,7 +77,7 @@ npm run dev
 # Aplikasi akan berjalan di http://localhost:5173
 ```
 
-## 🔗 Cara Penggunaan (Simulasi iFrame)
+## Cara Penggunaan (Simulasi iFrame)
 
 Untuk mensimulasikan penggunaan di dalam LMS, buka browser dengan URL berikut:
 
@@ -85,12 +85,12 @@ Untuk mensimulasikan penggunaan di dalam LMS, buka browser dengan URL berikut:
 http://localhost:5173?tutorial_id=35363&user_id=1
 ```
 
-*   **`tutorial_id`**: ID materi yang sedang dibuka (contoh: 35363).
-*   **`user_id`**: ID pengguna (contoh: 1, 2, dst).
+*   **tutorial_id**: ID materi yang sedang dibuka (contoh: 35363).
+*   **user_id**: ID pengguna (contoh: 1, 2, dst).
 
-> **Catatan**: Mengganti `user_id` akan mensimulasikan pengguna yang berbeda dengan preferensi tampilan dan progress kuis yang terisolasi.
+**Catatan**: Mengganti user_id akan mensimulasikan pengguna yang berbeda dengan preferensi tampilan dan progress kuis yang terisolasi.
 
-## 👥 Kontributor (Capstone Team)
+## Kontributor (Capstone Team)
 
 *   **R004D5Y0212** - Andika Insan Patria - REBE
 *   **R004D5Y0985** - Krisna Setia Himawhan - REBE
